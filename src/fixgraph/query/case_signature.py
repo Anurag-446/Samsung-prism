@@ -6,7 +6,7 @@ from fixgraph.data.fingerprints import compute_sha256_string
 
 class CaseSignatureGenerator:
     def generate_signature(self, atom: SymptomAtom) -> CaseSignature:
-        domains_sorted = sorted(set(atom.domains))
+        domains_sorted = list(dict.fromkeys(atom.domains))
         symptoms_sorted = sorted(set(atom.symptoms))
         negated_symptoms_sorted = sorted(set(atom.constraints.negated_symptoms))
         prohibited_actions_sorted = sorted(set(atom.constraints.prohibited_actions))

@@ -116,10 +116,11 @@ Respond purely in JSON with the following structure:
 {{
     "actions": [
         {{
-            "action_name": "Action Name",
-            "description": "Why we are doing this",
-            "steps": ["Step 1", "Step 2"],
-            "source_evidence_ids": ["evidence_id_1"]
+            "action_id": "a1",
+            "intent": "Open Wi-Fi settings",
+            "steps": ["Open Settings", "Tap Connections", "Tap Wi-Fi"],
+            "evidence_ids": ["evidence_id_1"],
+            "candidate_screen_text": "Wi-Fi"
         }}
     ]
 }}"""
@@ -127,7 +128,13 @@ Respond purely in JSON with the following structure:
         try:
             cleaned = res.strip().strip("`").strip("json").strip()
             data = json.loads(cleaned)
-            actions = [CandidateAction.model_validate(a) for a in data.get("actions", [])]
+            valid_evidence_ids = {e.evidence_id for e in evidence_spans}
+            actions = []
+            for a in data.get("actions", []):
+                act = CandidateAction.model_validate(a)
+                act.evidence_ids = [e for e in act.evidence_ids if e in valid_evidence_ids]
+                if act.evidence_ids:
+                    actions.append(act)
             return CandidateActionExtractionResult(actions=actions)
         except Exception:
             return CandidateActionExtractionResult(actions=[])

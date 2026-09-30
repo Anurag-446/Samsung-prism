@@ -33,12 +33,22 @@ class ScreenResolver:
         for c in candidates:
             score = c.confidence
             record = self.catalog.get_by_id(c.catalog_record_id)
-            if record and record.metadata and record.metadata.original_type:
-                # Manager metadata: originalType = "App", "Menu", "Setting", "General"
-                # Penalize generic types if query is specific
-                o_type = record.metadata.original_type.lower()
-                if o_type in ["general", "app"] and "settings" not in intent_text.lower():
-                    score *= 0.8
+            if record and record.original_type:
+                o_type = record.original_type.lower()
+                i_text = intent_text.lower()
+                
+                # Intent semantic detection bonuses
+                bonus = 0.0
+                if o_type == "onurl" and any(w in i_text for w in ["enable", "turn on", "activate", "switch on"]):
+                    bonus = 0.05
+                elif o_type == "offurl" and any(w in i_text for w in ["disable", "turn off", "deactivate", "switch off"]):
+                    bonus = 0.05
+                elif o_type == "onclickurl" and any(w in i_text for w in ["open", "navigate", "go to", "show"]):
+                    bonus = 0.05
+                elif o_type == "updateurl" and any(w in i_text for w in ["change", "update", "modify", "set", "adjust"]):
+                    bonus = 0.05
+                
+                score += bonus
             reranked.append((c, score))
             
         reranked.sort(key=lambda x: x[1], reverse=True)

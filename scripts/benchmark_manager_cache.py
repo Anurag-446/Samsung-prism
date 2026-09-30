@@ -7,7 +7,6 @@ from fixgraph.bootstrap import build_catalog, build_challenge_assets
 from fixgraph.config import settings
 
 def main():
-    settings.cache_semantic_threshold = 0.95
     assets = build_challenge_assets(settings, "development")
     catalog = build_catalog(settings, assets, "development")
     service = TroubleshootService(catalog=catalog)
@@ -42,8 +41,9 @@ def main():
     from fixgraph.data.manager_cases import load_manager_cases
     cases = load_manager_cases("manager_assets/Theme 2/input.txt", "manager_assets/Theme 2/siis_responses.json")
         
-    with open("eval/cache/manager_paraphrases.json", "r") as f:
-        paraphrases = json.load(f)
+    with open("eval/retrieval/manager_screen_cases.json", "r") as f:
+        manager_cases = json.load(f)
+        
     with open("eval/cache/manager_hard_negatives.json", "r") as f:
         hard_negatives = json.load(f)
         
@@ -52,9 +52,10 @@ def main():
     tp, fn, tn, fp = 0, 0, 0, 0
     total_latency = 0
     
-    for item in paraphrases + hard_negatives:
+    true_positive_queries = {item["query"] for item in manager_cases}
+    for item in manager_cases + hard_negatives:
         q = item["query"]
-        expected_hit = item["expected_hit"]
+        expected_hit = True if "target_record_id" in item or q in true_positive_queries else False
         
         req = TroubleshootRequest(query=q, siis_response=None) # No SIIS for cache hit testing!
         start_t = time.time()
@@ -68,10 +69,12 @@ def main():
             tp += 1
         elif expected_hit and not is_hit:
             fn += 1
+            print(f"[BENCHMARK] Missed Hit: {q}")
         elif not expected_hit and not is_hit:
             tn += 1
         elif not expected_hit and is_hit:
             fp += 1
+            print(f"[BENCHMARK] False Positive: {q}")
             
         report.append(f"- Query: {q}\n  - Expected Hit: {expected_hit} | Actual: {is_hit}\n  - Source: {outcome.source} | Latency: {latency:.2f}ms\n")
             

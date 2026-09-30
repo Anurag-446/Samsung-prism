@@ -5,7 +5,8 @@ WORKDIR /app
 RUN useradd -m -s /bin/bash fixgraph_user
 
 COPY pyproject.toml .
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir torch>=2.0.0 transformers>=4.38.0
+RUN pip install --no-cache-dir ".[ml]"
 
 COPY . .
 

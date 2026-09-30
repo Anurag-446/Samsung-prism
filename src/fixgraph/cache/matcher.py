@@ -100,9 +100,11 @@ class TwoStageCacheMatcher:
 
         # Top-1 / Top-2 Margin evaluation
         if len(candidates) > 1:
-            top2_sim, _ = candidates[1]
+            top2_sim, top2_entry = candidates[1]
             margin = top1_sim - top2_sim
             if margin < self.min_margin:
-                return None, top1_sim, f"cache_miss_ambiguous_margin_{margin:.3f}"
+                # If they resolve to the exact same signature, it's not ambiguous.
+                if top1_entry.signature_hash != top2_entry.signature_hash:
+                    return None, top1_sim, f"cache_miss_ambiguous_margin_{margin:.3f}"
 
         return top1_entry, round(top1_sim, 4), "semantic_vector_match"

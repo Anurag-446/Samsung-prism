@@ -15,9 +15,21 @@ def main():
     catalog = build_catalog(settings, assets, "development")
     service = TroubleshootService(catalog=catalog, cache_db_path=db_path)
     
-    from fixgraph.data.manager_cases import load_manager_cases
-    cases = load_manager_cases("manager_assets/Theme 2/input.txt", "manager_assets/Theme 2/siis_responses.json")
+    import json
+    with open("eval/retrieval/manager_screen_cases.json", "r") as f:
+        manager_cases = json.load(f)
     
+    # Create mock cases structure
+    from dataclasses import dataclass
+    @dataclass
+    class MockCase:
+        query: str
+        siis_response: str
+        target_record_id: str
+    
+    cases = []
+    for m in manager_cases:
+        cases.append(MockCase(query=m["query"], siis_response="mock", target_record_id=m.get("target_record_id", "cat-01")))
     import fixgraph.providers.gemma as gemma_module
     from fixgraph.contracts.internal import ResolvedAction, RiskTier
     
@@ -58,7 +70,7 @@ def main():
     successes = 0
     failures = 0
     for case in cases:
-        req = TroubleshootRequest(query=case.query, siis_response=case.siis.content)
+        req = TroubleshootRequest(query=case.query, siis_response=case.siis_response)
         outcome = service.troubleshoot(req)
         
         status = outcome.status

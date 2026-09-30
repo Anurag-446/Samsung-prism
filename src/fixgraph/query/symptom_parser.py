@@ -16,10 +16,14 @@ class SymptomParser:
         domains: List[str] = list(norm_query.domain_tags)
         evidence_spans = evidence_spans or []
 
-        # 1. Deterministic hints
+        from fixgraph.query.fast_features import extract_fast_features
+        fast_features = extract_fast_features(norm_query)
+        domains = fast_features.probable_domains
+        trigger = fast_features.trigger_terms[0] if fast_features.trigger_terms else None
+        
+        # Keep deterministic symptoms from fast_features domains or keywords (since fast_features doesn't output symptoms)
         if any(w in text for w in ["drain", "draining", "drop", "dropping", "die", "dying"]):
             symptoms.append("battery_drain")
-            domains.append("battery protection")
         if any(w in text for w in ["connect", "connecting", "disconnect", "drop", "signal"]):
             if "wi-fi" in domains or "wifi" in text:
                 symptoms.append("wifi_disconnection")
@@ -27,19 +31,10 @@ class SymptomParser:
                 symptoms.append("bluetooth_pairing_failure")
         if any(w in text for w in ["location", "gps", "map", "accuracy"]):
             symptoms.append("location_inaccuracy")
-            domains.append("location")
         if any(w in text for w in ["flicker", "dark", "screen", "brightness"]):
             symptoms.append("display_issue")
-            domains.append("display")
         if any(w in text for w in ["reset", "wipe", "no service"]):
             symptoms.append("network_reset_required")
-            domains.append("reset mobile network settings")
-
-        trigger = None
-        if "after update" in text or "system update" in text:
-            trigger = "post_system_update"
-        elif "after app install" in text or "new app" in text:
-            trigger = "post_app_install"
 
         # 2. Structured LLM extraction
         llm_result = self.llm.extract_symptoms(norm_query.raw_query, evidence_spans)
@@ -58,8 +53,8 @@ class SymptomParser:
              constraints = UserConstraints()
 
         return SymptomAtom(
-            device=llm_result.device_family or norm_query.detected_device or "Galaxy",
-            domains=sorted(set(domains)),
+            device=fast_features.device_terms[0] if fast_features.device_terms else (llm_result.device_family or norm_query.detected_device or "Galaxy"),
+            domains=list(dict.fromkeys(domains)),
             symptoms=sorted(set(symptoms)) or ["general_troubleshooting"],
             trigger=trigger,
             uncertainty=llm_result.uncertainty,
