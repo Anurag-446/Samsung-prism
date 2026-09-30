@@ -6,3 +6,6 @@ class ProviderTimeoutError(ProviderError):
 
 class ProviderResponseError(ProviderError):
     pass
+
+class EmbedderInitializationError(ProviderError):
+    pass

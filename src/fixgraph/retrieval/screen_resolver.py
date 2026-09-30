@@ -9,11 +9,13 @@ from fixgraph.retrieval.fusion import HybridFusion
 
 class ScreenResolver:
     def __init__(
-        self, catalog: DeeplinkCatalog, fusion: HybridFusion = None, min_confidence: float = 0.2
+        self, catalog: DeeplinkCatalog, fusion: HybridFusion = None
     ):
+        from fixgraph.config import settings
         self.catalog = catalog
         self.fusion = fusion or HybridFusion(catalog)
-        self.min_confidence = min_confidence
+        self.min_confidence = settings.screen_resolution_threshold
+        self.min_margin = settings.screen_min_margin
 
     def resolve_action_intent(self, intent_text: str) -> Optional[ScreenCandidate]:
         """Resolve action intent to top exact catalog screen candidate or None if uncertain."""
@@ -24,11 +26,16 @@ class ScreenResolver:
         if not candidates:
             return None
 
-        top = candidates[0]
-        if top.confidence < self.min_confidence:
+        top1 = candidates[0]
+        if top1.confidence < self.min_confidence:
             return None
+            
+        if len(candidates) > 1:
+            top2 = candidates[1]
+            if (top1.confidence - top2.confidence) < self.min_margin:
+                return None
 
-        return top
+        return top1
 
     def get_catalog_record(self, record_id: str) -> Optional[DeeplinkRecord]:
         return self.catalog.get_by_id(record_id)

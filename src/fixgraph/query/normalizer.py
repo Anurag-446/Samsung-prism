@@ -55,5 +55,5 @@ class QueryNormalizer:
             clean_query=clean,
             tokens=tokens,
             detected_device=detected_device,
-            domain_tags=list(set(domain_tags)),
+            domain_tags=sorted(set(domain_tags)),
         )

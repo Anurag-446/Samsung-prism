@@ -6,6 +6,9 @@ from typing import List, Protocol
 import numpy as np
 
 
+from fixgraph.config import settings
+from fixgraph.providers.exceptions import EmbedderInitializationError
+
 class EmbedderProtocol(Protocol):
     @property
     def model_fingerprint(self) -> str: ...
@@ -15,12 +18,12 @@ class EmbedderProtocol(Protocol):
     def encode_batch(self, texts: List[str]) -> List[List[float]]: ...
 
 
-class LightweightEmbedder:
+class HashNGramEmbedder:
     """Lightweight deterministic TF-IDF / character-gram vector embedder for portable CPU environments."""
 
     def __init__(self, vocab_size: int = 256):
         self.vocab_size = vocab_size
-        self._fingerprint = "lightweight-tfidf-v1"
+        self._fingerprint = "hashngram-v1"
 
     @property
     def model_fingerprint(self) -> str:
@@ -54,11 +57,14 @@ class LightweightEmbedder:
 
 def get_embedder() -> EmbedderProtocol:
     """Return configured embedder instance."""
+    if settings.embedder_provider == "hashngram":
+        return HashNGramEmbedder()
+
     try:
         from sentence_transformers import SentenceTransformer
 
         class SentenceTransformerWrapper:
-            def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+            def __init__(self, model_name: str = settings.embedding_model_name):
                 self.model_name = model_name
                 self.model = SentenceTransformer(model_name)
 
@@ -75,6 +81,7 @@ def get_embedder() -> EmbedderProtocol:
                 return embs.tolist()
 
         return SentenceTransformerWrapper()
-    except Exception:
-        # Fallback to lightweight portable embedder if sentence-transformers is not available
-        return LightweightEmbedder()
+    except Exception as e:
+        if settings.allow_embedder_fallback:
+            return HashNGramEmbedder()
+        raise EmbedderInitializationError(f"Failed to load sentence-transformers model {settings.embedding_model_name}: {e}")

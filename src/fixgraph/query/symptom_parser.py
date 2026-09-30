@@ -59,8 +59,8 @@ class SymptomParser:
 
         return SymptomAtom(
             device=llm_result.device_family or norm_query.detected_device or "Galaxy",
-            domains=list(set(domains)),
-            symptoms=list(set(symptoms)) or ["general_troubleshooting"],
+            domains=sorted(set(domains)),
+            symptoms=sorted(set(symptoms)) or ["general_troubleshooting"],
             trigger=trigger,
             uncertainty=llm_result.uncertainty,
             constraints=constraints

@@ -7,10 +7,30 @@ from fixgraph.contracts.internal import CandidateAction, EvidenceSpan, RiskTier,
 
 class MockLLMProvider:
     """Deterministic Mock LLM Provider for unit tests and local pipeline execution."""
+    
+    def __init__(self):
+        self.call_count = 0
+
+    def extract_symptoms(self, query: str, evidence_spans: List[EvidenceSpan] = None) -> "SymptomExtractionResult":
+        from fixgraph.contracts.internal import SymptomExtractionResult, ExtractedSymptom, UserConstraints
+        self.call_count += 1
+        prohibited = ["reset"] if "reset" in query else []
+        completed = ["restart"] if "restarted" in query else []
+        symptoms = []
+        if "restarted" in query:
+            symptoms.append(ExtractedSymptom(name="network_issue", domain="general", confidence=1.0))
+        else:
+            symptoms.append(ExtractedSymptom(name="battery_drain" if "battery" in query else "general", domain="general", confidence=1.0))
+        return SymptomExtractionResult(
+            symptoms=symptoms,
+            constraints=UserConstraints(prohibited_actions=prohibited, completed_actions=completed)
+        )
 
     def extract_candidate_actions(
         self, query: str, atom: SymptomAtom, evidence_spans: List[EvidenceSpan]
-    ) -> List[CandidateAction]:
+    ) -> "CandidateActionExtractionResult":
+        from fixgraph.contracts.internal import CandidateActionExtractionResult
+        self.call_count += 1
         actions: List[CandidateAction] = []
         ev_ids = [e.evidence_id for e in evidence_spans] or ["ev_default"]
 
@@ -93,4 +113,4 @@ class MockLLMProvider:
                 )
             )
 
-        return actions
+        return CandidateActionExtractionResult(actions=actions)

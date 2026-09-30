@@ -38,7 +38,7 @@ class ScreenGrouper:
                         risk_tier=existing.risk_tier,
                         catalog_record_id=rec_id,
                         exact_uri=screen_cand.exact_uri,
-                        evidence_ids=list(set(existing.evidence_ids + cand.evidence_ids)),
+                        evidence_ids=sorted(set(existing.evidence_ids + cand.evidence_ids)),
                         screen_confidence=screen_cand.confidence,
                     )
                 else:

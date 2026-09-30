@@ -52,7 +52,9 @@ def health_check():
         )
 
 
-@router.post("/v1/troubleshoot", response_model=Goal, status_code=status.HTTP_200_OK)
+from fixgraph.contracts.public import ContextDeeplinkResponse, TroubleshootResponse
+
+@router.post("/v1/troubleshoot", response_model=TroubleshootResponse, status_code=status.HTTP_200_OK)
 def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Header(None, alias="X-Request-ID")):
     """Main troubleshooting engine endpoint (P0-01).
 
@@ -105,10 +107,9 @@ def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Head
             )
 
         # Build response manually to include X-Request-ID
-        from fixgraph.contracts.public import ContextDeeplinkResponse, TroubleshootResponse
         resp = TroubleshootResponse(
             query=request.query,
-            response=ContextDeeplinkResponse(contexts=[outcome.goal])
+            response=ContextDeeplinkResponse(contexts=[outcome.goal] if outcome.goal else [])
         )
         return JSONResponse(
             content=resp.model_dump(),
@@ -127,9 +128,11 @@ def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Head
 @router.post("/internal/troubleshoot", status_code=status.HTTP_200_OK)
 def internal_troubleshoot_endpoint(request: TroubleshootRequest):
     """Internal demo endpoint exposing full outcome for UI."""
-    if not settings.debug_mode and get_mode() != "development" and get_mode() != "test":
-        # Usually protected, but for demo let's allow it in test/development
-        pass
+    if get_mode() == "production":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Internal endpoint forbidden in production mode."
+        )
 
     service = get_service()
     if not service.catalog or len(service.catalog) == 0:

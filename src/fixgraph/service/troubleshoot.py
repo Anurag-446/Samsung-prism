@@ -31,6 +31,7 @@ from fixgraph.planning.sequencing import ActionSequencer
 from fixgraph.providers.exceptions import ProviderError
 from fixgraph.query.case_signature import CaseSignatureGenerator
 from fixgraph.query.normalizer import QueryNormalizer
+from fixgraph.query.fast_features import extract_fast_features
 from fixgraph.query.symptom_parser import SymptomParser
 from fixgraph.validation.fallback import get_safe_fallback_goal
 from fixgraph.validation.final_gate import (
@@ -100,7 +101,7 @@ class TroubleshootService:
         self.cache_store = CaseCacheStore(db_path=cache_db_path)
         self.cache_matcher = TwoStageCacheMatcher(
             store=self.cache_store,
-            similarity_threshold=settings.similarity_threshold,
+            similarity_threshold=settings.cache_semantic_threshold,
             min_margin=settings.cache_min_margin
         )
 
@@ -146,8 +147,9 @@ class TroubleshootService:
         norm_query = self.normalizer.normalize(request.query)
         query_hash = hashlib.sha256(norm_query.clean_query.encode('utf-8')).hexdigest()[:8]
 
-        # 2. Extract symptom atom & canonical signature (deterministically, before provider extraction)
-        temp_atom = self.symptom_parser.extract_atoms(norm_query)
+        # 2. Extract fast features & canonical signature (deterministically, before provider extraction)
+        fast_features = extract_fast_features(norm_query)
+        temp_atom = fast_features.to_symptom_atom()
         signature = self.sig_generator.generate_signature(temp_atom)
 
         # 3. Generate Runtime Fingerprint
@@ -208,13 +210,14 @@ class TroubleshootService:
 
         # 5. Evidence collection
         evidence_spans = self.evidence_resolver.segment_evidence(request.siis_response)
-        if not evidence_spans:
-            evidence_spans = self.local_retriever.retrieve(norm_query.clean_query)
-
         metrics.evidence_span_count = len(evidence_spans)
 
         fallback_reason = None
         compiled_goal = None
+
+        if not evidence_spans:
+            logger.warning(f"[req_id={req_id}] No SIIS evidence found and cache miss. Skipping model generation.")
+            fallback_reason = "no_evidence"
 
         try:
             metrics.llm_called = True
@@ -254,6 +257,7 @@ class TroubleshootService:
                     raw_query=request.query,
                     atom=atom,
                     resolved_actions=sequenced_actions,
+                    catalog=self.catalog
                 )
 
         except ProviderError as e:

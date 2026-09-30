@@ -29,12 +29,12 @@ class TwoStageCacheMatcher:
         store: CaseCacheStore,
         embedder: EmbedderProtocol = None,
         similarity_threshold: float = None,
-        min_margin: float = 0.05
+        min_margin: float = None
     ):
         self.store = store
         self.embedder = embedder or get_embedder()
-        self.similarity_threshold = similarity_threshold if similarity_threshold is not None else settings.similarity_threshold
-        self.min_margin = min_margin
+        self.similarity_threshold = similarity_threshold if similarity_threshold is not None else settings.cache_semantic_threshold
+        self.min_margin = min_margin if min_margin is not None else settings.cache_min_margin
         self.compatibility_validator = CacheCompatibilityValidator()
 
     def lookup(

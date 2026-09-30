@@ -19,19 +19,30 @@ class Settings(BaseSettings):
     port: int = 8000
 
     # LLM settings
-    llm_provider: str = "mock"  # "mock", "openai", "azure"
+    llm_provider: str = "gemma_local"  # "mock", "openai", "azure", "gemma_local"
     llm_api_key: Optional[str] = None
-    llm_model_name: str = "gpt-4o-mini"
+    llm_model_name: str = "google/gemma-4-E2B-it"
     llm_temperature: float = 0.0
     llm_timeout_seconds: float = 10.0
     llm_max_retries: int = 1
     min_action_evidence_score: float = 0.35
 
     # Embedding settings
-    embedding_model_name: str = "all-MiniLM-L6-v2"
-    similarity_threshold: float = 0.82
+    embedder_provider: str = "bge"
+    embedding_model_name: str = "BAAI/bge-small-en-v1.5"
+    enable_cross_encoder_reranker: bool = False
+    reranker_model_name: str = "BAAI/bge-reranker-base"
+    allow_embedder_fallback: bool = False
+
+    # Cache thresholds
+    cache_semantic_threshold: float = 0.82
     cache_min_margin: float = 0.05
     cache_store_raw_query: bool = False
+
+    # Screen resolution thresholds
+    screen_dense_threshold: float = 0.65
+    screen_resolution_threshold: float = 0.70
+    screen_min_margin: float = 0.02
 
     # Storage paths
     cache_db_path: str = "data/cache.db"

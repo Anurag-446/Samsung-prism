@@ -11,6 +11,9 @@ def create_llm_provider(settings: Settings) -> LLMProvider:
     provider_name = settings.llm_provider.lower()
     if provider_name == "mock":
         return MockLLMProvider()
+    elif provider_name == "gemma_local":
+        from fixgraph.providers.gemma import GemmaLocalProvider
+        return GemmaLocalProvider(model_name=settings.llm_model_name)
     elif provider_name in ["openai", "azure"]:
         if not settings.llm_api_key:
             raise ProviderError(f"API key is required for {provider_name} provider")

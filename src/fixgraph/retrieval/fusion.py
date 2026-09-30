@@ -40,16 +40,38 @@ class HybridFusion:
             dense_score_map[rec_id] = score
             rrf_scores[rec_id] = rrf_scores.get(rec_id, 0.0) + (1.0 / (k_rrf + rank))
 
-        # Build candidate list
+        # Build candidate list and compute deterministic metadata score
         candidates: List[ScreenCandidate] = []
-        for rec_id, rrf_score in rrf_scores.items():
-            rec = records_map[rec_id]
+        max_bm25 = max(bm25_score_map.values()) if bm25_score_map else 1.0
+        if max_bm25 == 0.0:
+            max_bm25 = 1.0
+
+        for rec_id, rec in records_map.items():
             bm_s = bm25_score_map.get(rec_id, 0.0)
             dn_s = dense_score_map.get(rec_id, 0.0)
-
-            # Normalize combined confidence
-            conf = float(rrf_score * 30.0)
-            conf = min(max(conf, 0.0), 1.0)
+            
+            norm_bm25 = bm_s / max_bm25
+            
+            # Base combination
+            base_score = (norm_bm25 * 0.4) + (dn_s * 0.6)
+            
+            # Metadata heuristics
+            searchable_text = rec.get_searchable_text().lower()
+            q_lower = query.lower()
+            
+            bonus = 0.0
+            
+            if rec.name.lower() in q_lower or q_lower in rec.name.lower():
+                bonus += 0.15
+            if rec.original_type and rec.original_type.lower() in q_lower:
+                bonus += 0.05
+            if rec.validation and rec.validation.get("key") and str(rec.validation.get("key")).lower() in q_lower:
+                bonus += 0.05
+                
+            if "general" in rec.name.lower() or "misc" in rec.name.lower():
+                bonus -= 0.1
+                
+            conf = min(max(base_score + bonus, 0.0), 1.0)
 
             candidates.append(
                 ScreenCandidate(
@@ -58,7 +80,7 @@ class HybridFusion:
                     screen_name=rec.name,
                     bm25_score=float(bm_s),
                     dense_score=float(dn_s),
-                    combined_score=float(rrf_score),
+                    combined_score=float(conf),
                     confidence=conf,
                     matched_metadata=rec.get_searchable_text()[:100],
                 )
