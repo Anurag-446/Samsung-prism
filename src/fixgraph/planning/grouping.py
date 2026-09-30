@@ -3,7 +3,7 @@
 from typing import Dict, List
 
 from fixgraph.contracts.internal import CandidateAction, ResolvedAction, RiskTier, ScreenCandidate
-from fixgraph.navigation.resolver import NavigationAwareScreenResolver as ScreenResolver
+from fixgraph.retrieval.screen_resolver import ScreenResolver
 
 
 class ScreenGrouper:

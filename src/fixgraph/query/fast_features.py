@@ -49,9 +49,26 @@ def extract_fast_features(norm_query: NormalizedQuery) -> FastCaseFeatures:
     elif "after app install" in text or "new app" in text:
         trigger_terms.append("post_app_install")
         
+    prohibited_actions = []
+    completed_actions = []
+    
+    if any(phrase in text for phrase in ["already tried", "i tried", "have tried", "restarted", "rebooted"]):
+        if "restart" in text or "restarted" in text or "reboot" in text:
+            completed_actions.append("restart")
+        if "reset" in text or "factory reset" in text:
+            completed_actions.append("reset")
+            
+    if any(phrase in text for phrase in ["do not", "don't", "without"]):
+        if "reset" in text or "wipe" in text:
+            prohibited_actions.append("reset")
+        if "delete" in text:
+            prohibited_actions.append("delete data")
+            
     return FastCaseFeatures(
         normalized_query=text,
         probable_domains=sorted(set(domains)),
         trigger_terms=trigger_terms,
+        prohibited_actions=prohibited_actions,
+        completed_actions=completed_actions,
         device_terms=[norm_query.detected_device] if norm_query.detected_device else []
     )

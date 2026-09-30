@@ -61,11 +61,22 @@ class ContextDeeplinkResponse(BaseModel):
 
 # --- Outer API Request/Response wrappers ---
 
+class SIISResponsePayload(BaseModel):
+    title: Optional[str] = None
+    content: str
+
 class TroubleshootRequest(BaseModel):
     query: str = Field(..., min_length=1, description="Raw user complaint string")
-    siis_response: Optional[str] = Field(
-        default=None, description="Optional SIIS reference context text"
+    siis_response: Optional[str | SIISResponsePayload] = Field(
+        default=None, description="Optional SIIS reference context text or object"
     )
+
+    def get_normalized_siis_content(self) -> Optional[str]:
+        if not self.siis_response:
+            return None
+        if isinstance(self.siis_response, str):
+            return self.siis_response
+        return self.siis_response.content
 
 class TroubleshootResponse(BaseModel):
     query: str

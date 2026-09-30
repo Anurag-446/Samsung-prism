@@ -27,15 +27,35 @@ class ScreenResolver:
             return None
 
         top1 = candidates[0]
-        if top1.confidence < self.min_confidence:
+        # Rerank candidates based on specificity (originalType)
+        # Deep links like Settings/Connections/Wi-Fi should win over Settings
+        reranked = []
+        for c in candidates:
+            score = c.confidence
+            record = self.catalog.get_by_id(c.catalog_record_id)
+            if record and record.metadata and record.metadata.original_type:
+                # Manager metadata: originalType = "App", "Menu", "Setting", "General"
+                # Penalize generic types if query is specific
+                o_type = record.metadata.original_type.lower()
+                if o_type in ["general", "app"] and "settings" not in intent_text.lower():
+                    score *= 0.8
+            reranked.append((c, score))
+            
+        reranked.sort(key=lambda x: x[1], reverse=True)
+        top1_tuple = reranked[0]
+        top1_cand = top1_tuple[0]
+        top1_score = top1_tuple[1]
+        
+        if top1_score < self.min_confidence:
             return None
             
-        if len(candidates) > 1:
-            top2 = candidates[1]
-            if (top1.confidence - top2.confidence) < self.min_margin:
+        if len(reranked) > 1:
+            top2_score = reranked[1][1]
+            if (top1_score - top2_score) < self.min_margin:
                 return None
 
-        return top1
+        top1_cand.confidence = top1_score
+        return top1_cand
 
     def get_catalog_record(self, record_id: str) -> Optional[DeeplinkRecord]:
         return self.catalog.get_by_id(record_id)

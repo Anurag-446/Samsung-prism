@@ -10,7 +10,7 @@ from fixgraph.observability.logging import logger
 
 class GemmaLocalProvider(LLMProvider):
     def __init__(self, model_name: str = settings.llm_model_name):
-        self.model_name = model_name
+        self._model_name = model_name
         self.call_count = 0
         self.is_loaded = False
         
@@ -25,6 +25,14 @@ class GemmaLocalProvider(LLMProvider):
             self.transformers_version = "not_installed"
             self.torch_version = "not_installed"
 
+    @property
+    def provider_id(self) -> str:
+        return "local_hf"
+        
+    @property
+    def model_id(self) -> str:
+        return self._model_name
+
     def _load_model(self):
         if self.is_loaded:
             return
@@ -33,16 +41,16 @@ class GemmaLocalProvider(LLMProvider):
             import torch
             
             start_t = time.time()
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(self._model_name)
             self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_name,
+                self._model_name,
                 device_map="auto",
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
             )
             self.is_loaded = True
-            logger.info(f"Loaded {self.model_name} in {time.time() - start_t:.2f}s")
+            logger.info(f"Loaded {self._model_name} in {time.time() - start_t:.2f}s")
         except Exception as e:
-            raise ProviderError(f"Failed to load Gemma model {self.model_name}: {e}")
+            raise ProviderError(f"Failed to load Gemma model {self._model_name}: {e}")
             
     def _run_inference(self, prompt: str) -> str:
         self.call_count += 1
@@ -65,8 +73,6 @@ class GemmaLocalProvider(LLMProvider):
 
     def extract_symptoms(self, query: str, evidence_spans: List[EvidenceSpan] = None) -> SymptomExtractionResult:
         self.call_count += 1
-        # Mocking or extracting since we don't have GPU to run this fast in unit tests
-        # We will parse via regex/defaults if model isn't installed for testing
         if self.transformers_version == "not_installed":
             prohibited = ["reset"] if "reset" in query else []
             completed = ["restart"] if "restarted" in query else []
@@ -80,10 +86,11 @@ class GemmaLocalProvider(LLMProvider):
                 constraints=UserConstraints(prohibited_actions=prohibited, completed_actions=completed)
             )
             
-        prompt = f"Extract structured symptoms from this query: {query}\n\nEvidence: {evidence_spans}\nOutput JSON:"
+        prompt = f"Extract structured symptoms from this query: {query}\n\nEvidence: {evidence_spans}\nRespond purely in JSON."
         res = self._run_inference(prompt)
         try:
-            data = json.loads(res)
+            cleaned = res.strip().strip("`").strip("json").strip()
+            data = json.loads(cleaned)
             return SymptomExtractionResult.model_validate(data)
         except Exception:
             return SymptomExtractionResult(symptoms=[ExtractedSymptom(name="general", domain="general", confidence=1.0)])
@@ -94,13 +101,32 @@ class GemmaLocalProvider(LLMProvider):
         from fixgraph.contracts.internal import CandidateActionExtractionResult
         self.call_count += 1
         if self.transformers_version == "not_installed":
-            # Deterministic fallback behavior when model isn't available
             return CandidateActionExtractionResult(actions=[])
             
-        prompt = f"Extract actions for query '{query}'. Use evidence ids from: {evidence_spans}. Output JSON format:"
+        evidence_str = "\n".join([f"[{e.evidence_id}] {e.text_content}" for e in evidence_spans])
+        prompt = f"""You are a Samsung support agent.
+Extract candidate actions to solve the user's issue based strictly on the provided evidence.
+DO NOT invent any steps or actions not found in the evidence.
+
+Query: {query}
+Evidence:
+{evidence_str}
+
+Respond purely in JSON with the following structure:
+{{
+    "actions": [
+        {{
+            "action_name": "Action Name",
+            "description": "Why we are doing this",
+            "steps": ["Step 1", "Step 2"],
+            "source_evidence_ids": ["evidence_id_1"]
+        }}
+    ]
+}}"""
         res = self._run_inference(prompt)
         try:
-            data = json.loads(res)
+            cleaned = res.strip().strip("`").strip("json").strip()
+            data = json.loads(cleaned)
             actions = [CandidateAction.model_validate(a) for a in data.get("actions", [])]
             return CandidateActionExtractionResult(actions=actions)
         except Exception:

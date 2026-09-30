@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)
-![Status](https://img.shields.io/badge/Status-Submission_Ready-success.svg)
+![Status](https://img.shields.io/badge/Status-Evaluation_In_Progress-yellow.svg)
 
 **FixGraph** transforms a Samsung Galaxy troubleshooting complaint into a deterministic, evidence-bounded, risk-ordered sequence of verified Settings actions. It acts as a safety compiler for GenAI, preventing unsupported or fabricated deeplinks from ever reaching the user.
 

@@ -21,7 +21,7 @@ from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 from fixgraph.data.fingerprints import compute_sha256_string
 from fixgraph.evidence.resolver import EvidenceResolver
 from fixgraph.evidence.retriever import LocalEvidenceRetriever
-from fixgraph.navigation.resolver import NavigationAwareScreenResolver as ScreenResolver
+from fixgraph.retrieval.screen_resolver import ScreenResolver
 from fixgraph.observability.logging import logger
 from fixgraph.planning.action_extractor import ActionExtractor
 from fixgraph.planning.compiler import PlanCompiler
@@ -209,7 +209,8 @@ class TroubleshootService:
         logger.info(f"[req_id={req_id}] Cache MISS for query_hash '{query_hash}'. Executing full pipeline compiler.")
 
         # 5. Evidence collection
-        evidence_spans = self.evidence_resolver.segment_evidence(request.siis_response)
+        siis_content = request.get_normalized_siis_content()
+        evidence_spans = self.evidence_resolver.segment_evidence(siis_content)
         metrics.evidence_span_count = len(evidence_spans)
 
         fallback_reason = None
@@ -217,7 +218,9 @@ class TroubleshootService:
 
         if not evidence_spans:
             logger.warning(f"[req_id={req_id}] No SIIS evidence found and cache miss. Skipping model generation.")
-            fallback_reason = "no_evidence"
+            metrics.total_latency_ms = round((time.time() - start_ts) * 1000.0, 2)
+            # Manager-mode no-SIIS miss must result in: goal = None
+            return TroubleshootOutcome(request_id=req_id, status="success", goal=None, source="no_evidence", metrics=metrics)
 
         try:
             metrics.llm_called = True

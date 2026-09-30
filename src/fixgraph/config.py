@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # LLM settings
     llm_provider: str = "gemma_local"  # "mock", "openai", "azure", "gemma_local"
     llm_api_key: Optional[str] = None
-    llm_model_name: str = "google/gemma-4-E2B-it"
+    llm_model_name: str = "Qwen/Qwen2.5-0.5B"
     llm_temperature: float = 0.0
     llm_timeout_seconds: float = 10.0
     llm_max_retries: int = 1
@@ -46,10 +46,10 @@ class Settings(BaseSettings):
 
     # Storage paths
     cache_db_path: str = "data/cache.db"
-    challenge_assets_dir: str = "tests/fixtures/challenge_assets"
-    deeplinks_path: str = "tests/fixtures/challenge_assets/deeplinks.json"
-    queries_path: str = "tests/fixtures/challenge_assets/queries.json"
-    siis_path: str = "tests/fixtures/challenge_assets/siis_responses.json"
+    challenge_assets_dir: str = "manager_assets/Theme 2"
+    deeplinks_path: str = "manager_assets/Theme 2/deeplinks.json"
+    queries_path: str = "manager_assets/Theme 2/input.txt"
+    siis_path: str = "manager_assets/Theme 2/siis_responses.json"
 
     # Latency targets (ms)
     cache_hit_p95_limit_ms: float = 300.0
