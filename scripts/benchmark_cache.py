@@ -4,6 +4,8 @@ import json
 import os
 import time
 from pathlib import Path
+
+from fixgraph.config import settings
 from fixgraph.contracts.public import TroubleshootRequest
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.service.troubleshoot import TroubleshootService
@@ -56,7 +58,7 @@ def run_cache_benchmark():
     if os.path.exists(db_path):
         os.remove(db_path)
 
-    catalog = load_deeplink_catalog(None)
+    catalog = load_deeplink_catalog(settings.deeplinks_path)
     service = TroubleshootService(catalog=catalog, cache_db_path=db_path)
 
     # Warm cache with canonical queries
@@ -102,9 +104,9 @@ def run_cache_benchmark():
 - **Total Test Paraphrases**: {total_paraphrases}
 - **Cache Hits**: {hits}
 - **Hit Rate**: **{hit_rate:.2f}%** (Target: >=80.0%)
-- **Target Met**: {'YES (PASS)' if hit_rate >= 80.0 else 'NO'}
+- **Target Met**: {"YES (PASS)" if hit_rate >= 80.0 else "NO"}
 - **P95 Hit Latency**: **{p95_latency:.2f} ms** (Target: <=300.0 ms)
-- **Latency Target Met**: {'YES (PASS)' if p95_latency <= 300.0 else 'NO'}
+- **Latency Target Met**: {"YES (PASS)" if p95_latency <= 300.0 else "NO"}
 """
     with open("reports/cache_benchmark.md", "w") as f:
         f.write(md_content)

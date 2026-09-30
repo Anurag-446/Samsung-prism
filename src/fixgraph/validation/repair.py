@@ -1,6 +1,7 @@
 """Deterministic repair pass fixing minor formatting issues without altering semantics (M4-06)."""
 
 from typing import List, Tuple
+
 from fixgraph.contracts.public import Action, CategoryEnum, Goal
 from fixgraph.validation.pipeline import ValidationPipeline
 

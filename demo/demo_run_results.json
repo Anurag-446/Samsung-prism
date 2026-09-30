@@ -1,0 +1,44 @@
+[
+  {
+    "case_id": "demo_1",
+    "query": "battery drain fast and location gps accuracy is wrong",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 4.683256149291992
+  },
+  {
+    "case_id": "demo_2",
+    "query": "wifi not connecting to access point network drops",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 2.126455307006836
+  },
+  {
+    "case_id": "demo_3",
+    "query": "wifi not connecting to access point network drops",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 2.0813941955566406
+  },
+  {
+    "case_id": "demo_4",
+    "query": "I want to reduce the refresh rate",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 1.6186237335205078
+  },
+  {
+    "case_id": "demo_5",
+    "query": "my phone camera lens is physically shattered",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 2.215147018432617
+  },
+  {
+    "case_id": "demo_6",
+    "query": "factory reset my phone",
+    "source": "fallback",
+    "actions": 1,
+    "latency_ms": 2.0012855529785156
+  }
+]

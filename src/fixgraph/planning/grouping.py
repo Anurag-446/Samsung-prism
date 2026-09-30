@@ -1,6 +1,7 @@
 """One-action-one-screen grouper logic (P0-11 & M4-01)."""
 
 from typing import Dict, List
+
 from fixgraph.contracts.internal import CandidateAction, ResolvedAction, RiskTier, ScreenCandidate
 from fixgraph.retrieval.screen_resolver import ScreenResolver
 

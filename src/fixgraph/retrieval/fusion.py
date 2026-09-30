@@ -1,6 +1,7 @@
 """Hybrid rank fusion combining sparse BM25 and dense vector scores (M2-04)."""
 
-from typing import Dict, List, Tuple
+from typing import Dict, List
+
 from fixgraph.contracts.internal import ScreenCandidate
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 from fixgraph.retrieval.bm25_index import BM25Index
@@ -8,7 +9,9 @@ from fixgraph.retrieval.dense_index import DenseIndex
 
 
 class HybridFusion:
-    def __init__(self, catalog: DeeplinkCatalog, bm25_index: BM25Index = None, dense_index: DenseIndex = None):
+    def __init__(
+        self, catalog: DeeplinkCatalog, bm25_index: BM25Index = None, dense_index: DenseIndex = None
+    ):
         self.catalog = catalog
         self.bm25 = bm25_index or BM25Index(catalog)
         self.dense = dense_index or DenseIndex(catalog)

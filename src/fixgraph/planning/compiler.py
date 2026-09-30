@@ -1,6 +1,7 @@
 """Final plan compiler converting internal resolved actions to official Goal model (M4-04)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import ResolvedAction, SymptomAtom
 from fixgraph.contracts.public import (
     Action,

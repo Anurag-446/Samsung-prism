@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.retrieval.bm25_index import BM25Index
 from fixgraph.retrieval.dense_index import DenseIndex
@@ -60,9 +61,9 @@ def run_retrieval_benchmark():
     md_content = f"""# Screen Resolution Retrieval Benchmark Report
 
 - **Total Labeled Cases**: {total}
-- **BM25 Top-1 Accuracy**: {report['bm25_top1_acc_pct']}%
-- **Dense Vector Top-1 Accuracy**: {report['dense_top1_acc_pct']}%
-- **Hybrid RRF Top-1 Accuracy**: **{report['hybrid_top1_acc_pct']}%**
+- **BM25 Top-1 Accuracy**: {report["bm25_top1_acc_pct"]}%
+- **Dense Vector Top-1 Accuracy**: {report["dense_top1_acc_pct"]}%
+- **Hybrid RRF Top-1 Accuracy**: **{report["hybrid_top1_acc_pct"]}%**
 """
     with open("reports/retrieval_benchmark.md", "w") as f:
         f.write(md_content)

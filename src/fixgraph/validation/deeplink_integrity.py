@@ -1,6 +1,7 @@
 """Deeplink integrity validator prohibiting fabricated URIs (P0-06, P0-07, P0-12)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import ValidationIssue
 from fixgraph.contracts.public import CategoryEnum, Goal
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog

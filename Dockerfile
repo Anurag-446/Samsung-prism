@@ -2,26 +2,25 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+RUN useradd -m -s /bin/bash fixgraph_user
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
 
-COPY pyproject.toml /app/
-COPY README.md /app/
+COPY . .
 
-RUN pip install --no-cache-dir -e .
+RUN mkdir -p /app/challenge_assets && \
+    mkdir -p /app/.data && \
+    chown -R fixgraph_user:fixgraph_user /app
 
-COPY challenge_assets /app/challenge_assets/
-COPY src /app/src/
+USER fixgraph_user
+
+ENV FIXGRAPH_MODE=production
+ENV FIXGRAPH_PORT=8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
 
 EXPOSE 8000
-
-HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["uvicorn", "fixgraph.app:app", "--host", "0.0.0.0", "--port", "8000"]

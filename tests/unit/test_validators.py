@@ -37,7 +37,9 @@ def test_textual_rule_validator():
         steps=[StepGroup(step="Toggle Location switch to ON")],
         category=CategoryEnum.AUTO,
         deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.location/LocationSettingsActivity")
+            baseDeeplink=BaseDeeplink(
+                uri="bixby://com.samsung.android.settings.location/LocationSettingsActivity"
+            )
         ),
     )
 
@@ -53,13 +55,15 @@ def test_textual_rule_validator():
     assert len(issues) == 0
 
     # Invalid title (> 3 words)
-    invalid_title_goal = valid_goal.model_copy(update={"title": "Fix the location accuracy issue now"})
+    invalid_title_goal = valid_goal.model_copy(
+        update={"title": "Fix the location accuracy issue now"}
+    )
     issues = validator.validate_goal(invalid_title_goal)
     assert any(i.code == "TITLE_WORD_COUNT_INVALID" for i in issues)
 
 
 def test_deeplink_integrity_validator():
-    catalog = load_deeplink_catalog(None)
+    catalog = load_deeplink_catalog("tests/fixtures/challenge_assets/deeplinks.json")
     validator = DeeplinkIntegrityValidator(catalog)
 
     # Fabricated deeplink
@@ -94,7 +98,9 @@ def test_risk_order_validator():
         steps=[StepGroup(step="Tap Reset Network Settings")],
         category=CategoryEnum.CRITICAL,
         deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.reset/ResetNetworkSettingsActivity")
+            baseDeeplink=BaseDeeplink(
+                uri="bixby://com.samsung.android.settings.reset/ResetNetworkSettingsActivity"
+            )
         ),
     )
 
@@ -104,7 +110,9 @@ def test_risk_order_validator():
         steps=[StepGroup(step="Tap Wi-Fi Settings")],
         category=CategoryEnum.AUTO,
         deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity")
+            baseDeeplink=BaseDeeplink(
+                uri="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity"
+            )
         ),
     )
 

@@ -1,6 +1,7 @@
 """Query variation and paraphrase generator producing 8-10 distinct registers (M5-06)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import SymptomAtom
 
 
@@ -36,6 +37,6 @@ class ParaphraseGenerator:
         deduped = list(dict.fromkeys(variations))
         if len(deduped) < 8:
             for i in range(len(deduped), 8):
-                deduped.append(f"{query_clean} troubleshooting option {i+1}")
+                deduped.append(f"{query_clean} troubleshooting option {i + 1}")
 
         return deduped[:10]

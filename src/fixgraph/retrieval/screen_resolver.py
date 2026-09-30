@@ -1,13 +1,16 @@
 """Screen resolver mapping candidate actions to exact catalog records (M2-05)."""
 
-from typing import List, Optional
+from typing import Optional
+
 from fixgraph.contracts.internal import ScreenCandidate
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 from fixgraph.retrieval.fusion import HybridFusion
 
 
 class ScreenResolver:
-    def __init__(self, catalog: DeeplinkCatalog, fusion: HybridFusion = None, min_confidence: float = 0.2):
+    def __init__(
+        self, catalog: DeeplinkCatalog, fusion: HybridFusion = None, min_confidence: float = 0.2
+    ):
         self.catalog = catalog
         self.fusion = fusion or HybridFusion(catalog)
         self.min_confidence = min_confidence

@@ -1,6 +1,7 @@
 """LLM Provider abstraction for structured candidate action generation."""
 
-from typing import List, Optional
+from typing import List
+
 from fixgraph.contracts.internal import CandidateAction, EvidenceSpan, RiskTier, SymptomAtom
 
 

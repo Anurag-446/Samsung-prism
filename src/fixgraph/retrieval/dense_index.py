@@ -1,7 +1,9 @@
 """Dense vector index over descriptive catalog metadata (P1-12)."""
 
 from typing import List, Tuple
+
 import numpy as np
+
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 from fixgraph.providers.embedder import EmbedderProtocol, get_embedder
 

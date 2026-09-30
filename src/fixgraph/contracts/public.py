@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import List, Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -54,7 +55,10 @@ class Action(BaseModel):
 
 
 class Goal(BaseModel):
-    goal: str = Field(..., description="Standardized goal statement: Follow these steps to perform this <Topic> Troubleshooting")
+    goal: str = Field(
+        ...,
+        description="Standardized goal statement: Follow these steps to perform this <Topic> Troubleshooting",
+    )
     title: str = Field(..., description="2-3 word sentence case title identifying core issue")
     score: float = Field(..., ge=0.0, le=1.0, description="Confidence score in range [0.0, 1.0]")
     actions: List[Action] = Field(..., min_length=1)
@@ -68,7 +72,9 @@ class Goal(BaseModel):
 
 class TroubleshootRequest(BaseModel):
     query: str = Field(..., min_length=1, description="Raw user complaint string")
-    siis_response: Optional[str] = Field(default=None, description="Optional SIIS reference context text")
+    siis_response: Optional[str] = Field(
+        default=None, description="Optional SIIS reference context text"
+    )
 
 
 class HealthResponse(BaseModel):

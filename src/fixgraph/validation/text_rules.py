@@ -2,6 +2,7 @@
 
 import re
 from typing import List
+
 from fixgraph.contracts.internal import ValidationIssue
 from fixgraph.contracts.public import Goal
 

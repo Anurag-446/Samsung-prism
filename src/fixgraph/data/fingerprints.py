@@ -3,7 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 
 def compute_sha256_bytes(data: bytes) -> str:

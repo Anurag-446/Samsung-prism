@@ -1,6 +1,7 @@
 """Aggregated validation pipeline for total P0 compliance checking (M4-05)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import ValidationIssue, ValidationReport
 from fixgraph.contracts.public import Goal
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog
@@ -35,9 +36,13 @@ class ValidationPipeline:
         all_issues.extend(self.url_validator.validate_text(goal.title, "goal.title"))
 
         for idx, act in enumerate(goal.actions):
-            all_issues.extend(self.url_validator.validate_text(act.name, f"goal.actions[{idx}].name"))
             all_issues.extend(
-                self.url_validator.validate_text(act.description, f"goal.actions[{idx}].description")
+                self.url_validator.validate_text(act.name, f"goal.actions[{idx}].name")
+            )
+            all_issues.extend(
+                self.url_validator.validate_text(
+                    act.description, f"goal.actions[{idx}].description"
+                )
             )
             for s_idx, step in enumerate(act.steps):
                 all_issues.extend(

@@ -1,6 +1,7 @@
 """Action sequencer sorting actions from least disruptive to critical (P0-13 & M4-03)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import ResolvedAction, RiskTier
 
 

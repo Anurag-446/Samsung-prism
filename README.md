@@ -1,58 +1,45 @@
-# FixGraph — Smart Guided Troubleshooting Engine
+# FixGraph — Samsung PRISM Theme 2
 
-**Samsung PRISM GenAI Hackathon 3.0 (Theme 2)**  
-*Release Tag: `PRISM_GENAI_HACKATHON_Y2026`*
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)
+![Status](https://img.shields.io/badge/Status-Submission_Ready-success.svg)
 
-FixGraph is a **verified troubleshooting compiler** for Samsung Galaxy device complaints. It converts vague, multi-symptom complaints into a schema-valid, evidence-grounded, risk-ordered troubleshooting plan whose actionable steps map to exact catalog-approved masked Settings deeplinks.
+**FixGraph** transforms a Samsung Galaxy troubleshooting complaint into a deterministic, evidence-bounded, risk-ordered sequence of verified Settings actions. It acts as a safety compiler for GenAI, preventing unsupported or fabricated deeplinks from ever reaching the user.
 
----
+## Why FixGraph?
+Traditional LLM chatbots hallucinate. They invent fake Bixby URIs, propose destructive resets immediately, or offer software fixes for broken hardware. FixGraph removes the generative risk. 
 
-## Key Features
+**Our Guarantees:**
+1. **Zero Hallucinated Deeplinks**: The LLM *never* writes URLs. It only plans concepts. FixGraph maps these concepts to the exact Samsung catalog using Hybrid Dense/BM25 retrieval.
+2. **Evidence-Grounded**: Actions lacking support in official SIIS documents are stripped.
+3. **Zero False Cache Hits**: We don't just use cosine similarity. We enforce structural compatibility gates to prevent dangerous false-positive matches for similar-sounding issues.
+4. **Deterministic Risk Sorting**: Factory resets and destructive actions are automatically reordered to the end of any troubleshooting plan by a deterministic firewall.
 
-1. **Deterministic Deeplink Retrieval**: Hybrid (BM25 + Dense vector similarity) indexing over descriptive catalog metadata without matching against masked URI tokens. Exact URI strings are preserved verbatim.
-2. **Strict URL & Text Hygiene**: 0% web URL leakage (`http`, `https`, `www`, markdown web links). Programmatic enforcement of Goal syntax, 2-3 word sentence case title, and 5-7 word `It will...` description.
-3. **One Action = One Physical Screen**: Cross-screen candidate steps are grouped or split so each action represents exactly one physical Settings screen or feature.
-4. **Risk-Aware Sequencing**: Interventions are classified into risk tiers (`auto` standard configuration, `critical` disruptive/reset operations, `manual` physical interventions). Critical actions are sequenced last.
-5. **Two-Stage Persistent Semantic Cache**: Fast-path SQLite cache pairing canonical case signature matching with vector similarity. Achieves **>=80% paraphrase hit rate** with **P95 latency <=300ms**.
-
----
-
-## Quick Start & Installation
-
-### Requirements
-- Python 3.11+
-- Pip / Setuptools
-
-### Setup Instructions
-
+## Quick Start (Judge / Demo Mode)
+Ensure you have Python 3.11+ installed.
 ```bash
-# Clone the repository and navigate into directory
-cd Samsung_PRISM_Theme2_FixGraph_Execution_Pack
-
-# Install package in editable mode
-pip install -e .
-
-# Run test suite
-python -m pytest
-
-# Run API server
-uvicorn fixgraph.app:app --reload --port 8000
+python -m venv .venv
+# Activate venv: .venv\Scripts\Activate.ps1 (Windows) or source .venv/bin/activate (Linux/Mac)
+pip install -e ".[dev]"
+python scripts/run_dev.py
 ```
+Open [http://localhost:8000/](http://localhost:8000/) to access the FixGraph Product Dashboard.
 
-### Endpoints
-- **Troubleshoot**: `POST /v1/troubleshoot`
-- **Health Check**: `GET /health`
+## Architecture Highlights
+* **One-Action, One-Screen**: Resolves ambiguous parent menus (e.g., "Display") by actively searching for specific child deep-links (e.g., "Motion Smoothness").
+* **Validation Firewall**: A strict schema filter that audits all generated plans.
+* **Semantic Cache Lattices**: Sub-5ms response times for repeated problems without contacting the LLM.
 
----
-
-## Submission & Verification Commands
-
+## Reproducible Evaluation
+We evaluated FixGraph on a 130-case synthetic matrix, testing prompt injection, destructive ordering, and multi-symptom complaints.
 ```bash
-# Run unit, integration, schema & adversarial tests
-python -m pytest tests/
-
-# Run benchmark suites
-python scripts/benchmark_cache.py
-python scripts/benchmark_retrieval.py
-python scripts/benchmark_latency.py
+python scripts/run_full_evaluation.py --suite all --provider mock
 ```
+Read the full report at `reports/FINAL_EVALUATION_REPORT.md`.
+
+## Repository Map
+- `src/fixgraph/web/`: Modern Product Dashboard UI.
+- `src/fixgraph/api/`: FastAPI backend and core compiler limits.
+- `src/fixgraph/validation/`: The deterministic safety firewall rules.
+- `demo/`: Auto-runner and presentation scripts.
+- `eval/`: Raw testing datasets and configurations.

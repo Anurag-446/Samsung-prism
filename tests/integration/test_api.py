@@ -1,6 +1,14 @@
 """Integration tests for POST /v1/troubleshoot and GET /health FastAPI endpoints."""
 
+import os
+
+os.environ["FIXGRAPH_MODE"] = "test"
+os.environ["DEEPLINKS_PATH"] = "tests/fixtures/challenge_assets/deeplinks.json"
+os.environ["QUERIES_PATH"] = "tests/fixtures/challenge_assets/queries.json"
+os.environ["SIIS_PATH"] = "tests/fixtures/challenge_assets/siis_responses.json"
+
 from fastapi.testclient import TestClient
+
 from fixgraph.app import app
 
 client = TestClient(app)
@@ -33,7 +41,7 @@ def test_troubleshoot_endpoint_battery_query():
 
 def test_troubleshoot_endpoint_cache_hit():
     payload = {"query": "phone location accuracy issues"}
-    
+
     # First request -> Cold path
     res1 = client.post("/v1/troubleshoot", json=payload)
     assert res1.status_code == 200

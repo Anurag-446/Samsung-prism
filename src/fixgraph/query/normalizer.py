@@ -3,6 +3,7 @@
 import re
 import unicodedata
 from typing import List
+
 from fixgraph.contracts.internal import NormalizedQuery
 
 DOMAIN_ALIASES = {

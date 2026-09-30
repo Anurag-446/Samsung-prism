@@ -36,11 +36,11 @@ Samsung_PRISM_Theme2_FixGraph_Execution_Pack/
 
 | Asset Name | Status | Location / Strategy |
 |---|---|---|
-| `schema.py` | Absent in raw repo | Built strictly following official `08_API_AND_DATA_CONTRACT.md` spec in `src/fixgraph/contracts/public.py` |
-| `deeplinks.json` | Absent in raw repo | Loaded from `challenge_assets/deeplinks.json` if provided; fallback sample dataset provided for tests |
-| `queries.json` | Absent in raw repo | Loaded from `challenge_assets/queries.json` if provided; fallback sample dataset provided for tests |
-| `siis_responses.json` | Absent in raw repo | Loaded from `challenge_assets/siis_responses.json` if provided; fallback sample dataset provided for tests |
-| `samples/` | Absent in raw repo | Created in `challenge_assets/samples/` and `tests/fixtures/` with schema-compliant test pairs |
+| `schema.py` | Absent in raw repo | Built strictly following official `08_API_AND_DATA_CONTRACT.md` spec in `src/fixgraph/contracts/public.py`. A verification script exists to check compatibility. |
+| `deeplinks.json` | Absent in raw repo | Required for production. Must be placed in `challenge_assets/deeplinks.json`. Synthetic test fixture exists in `tests/fixtures/challenge_assets/`. |
+| `queries.json` | Absent in raw repo | Required for production. Synthetic test fixture exists in `tests/fixtures/challenge_assets/`. |
+| `siis_responses.json` | Absent in raw repo | Required for production. Synthetic test fixture exists in `tests/fixtures/challenge_assets/`. |
+| `samples/` | Absent in raw repo | Created in `challenge_assets/samples/` and `tests/fixtures/` with schema-compliant test pairs. |
 
 ---
 

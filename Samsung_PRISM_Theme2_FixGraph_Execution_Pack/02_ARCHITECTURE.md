@@ -144,11 +144,7 @@ Keep provenance:
 
 ```python
 EvidenceSpan(
-    source_id="siis:case_017",
-    text="...",
-    start=123,
-    end=211,
-    tags=["battery", "background_apps"]
+    source_id="siis:case_017", text="...", start=123, end=211, tags=["battery", "background_apps"]
 )
 ```
 
@@ -275,12 +271,7 @@ Recommended validators:
 The compiler returns:
 
 ```python
-ValidationReport(
-    passed=True,
-    errors=[],
-    warnings=[],
-    validation_hash="..."
-)
+ValidationReport(passed=True, errors=[], warnings=[], validation_hash="...")
 ```
 
 ### Layer K — deterministic repair
@@ -334,9 +325,17 @@ Define interfaces:
 
 ```python
 class LLMProvider(Protocol): ...
+
+
 class Embedder(Protocol): ...
+
+
 class EvidenceStore(Protocol): ...
+
+
 class DeeplinkStore(Protocol): ...
+
+
 class CaseCache(Protocol): ...
 ```
 

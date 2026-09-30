@@ -1,0 +1,90 @@
+[
+    {
+        "id": "dl_location_01",
+        "uri": "bixby://com.samsung.android.settings.location/LocationSettingsActivity",
+        "name": "Location Settings",
+        "description": "Location permissions, GPS toggle, location services, and location accuracy settings",
+        "message": "Turn on or turn off location services and manage application location permissions",
+        "qna_description": "How to fix location accuracy or enable location service",
+        "classes": "LocationSettingsActivity",
+        "controlType": "toggle",
+        "category": "auto"
+    },
+    {
+        "id": "dl_wifi_01",
+        "uri": "bixby://com.samsung.android.settings.wifi/WifiSettingsActivity",
+        "name": "Wi-Fi Settings",
+        "description": "Wi-Fi connection, network scan, saved Wi-Fi networks, and Wi-Fi direct configurations",
+        "message": "Connect to Wi-Fi networks and resolve network connectivity issues",
+        "qna_description": "Fix Wi-Fi not connecting or network dropping",
+        "classes": "WifiSettingsActivity",
+        "controlType": "toggle",
+        "category": "auto"
+    },
+    {
+        "id": "dl_bluetooth_01",
+        "uri": "bixby://com.samsung.android.settings.bluetooth/BluetoothSettingsActivity",
+        "name": "Bluetooth Settings",
+        "description": "Bluetooth device pairing, bluetooth toggle, connected devices, and audio codec settings",
+        "message": "Pair new Bluetooth devices or disconnect existing devices",
+        "qna_description": "Pair bluetooth earphone or fix bluetooth discovery issue",
+        "classes": "BluetoothSettingsActivity",
+        "controlType": "toggle",
+        "category": "auto"
+    },
+    {
+        "id": "dl_display_01",
+        "uri": "bixby://com.samsung.android.settings.display/DisplaySettingsActivity",
+        "name": "Display Settings",
+        "description": "Screen brightness, dark mode, motion smoothness refresh rate, screen timeout, font size, and eye comfort shield",
+        "message": "Adjust display parameters, refresh rate, or dark mode",
+        "qna_description": "Fix screen flickering or battery drain due to refresh rate",
+        "classes": "DisplaySettingsActivity",
+        "controlType": "slider",
+        "category": "auto"
+    },
+    {
+        "id": "dl_battery_01",
+        "uri": "bixby://com.samsung.android.settings.battery/BatteryProtectionActivity",
+        "name": "Battery Protection Settings",
+        "description": "Battery usage details, power saving mode, battery protection limit, fast charging toggle, and background app limits",
+        "message": "Manage battery drain, protect battery health, and configure power saving mode",
+        "qna_description": "Fix fast battery drain or configure power saver",
+        "classes": "BatteryProtectionActivity",
+        "controlType": "toggle",
+        "category": "auto"
+    },
+    {
+        "id": "dl_apps_01",
+        "uri": "bixby://com.samsung.android.settings.apps/AppListActivity",
+        "name": "Apps Management",
+        "description": "App permissions, force stop apps, clear app cache, clear app data, and default application management",
+        "message": "Manage installed applications, permissions, and app storage cache",
+        "qna_description": "Clear app cache or reset app permissions",
+        "classes": "AppListActivity",
+        "controlType": "list",
+        "category": "auto"
+    },
+    {
+        "id": "dl_reset_network_01",
+        "uri": "bixby://com.samsung.android.settings.reset/ResetNetworkSettingsActivity",
+        "name": "Reset Mobile Network Settings",
+        "description": "Reset Wi-Fi, Mobile Data, and Bluetooth settings to factory defaults",
+        "message": "Reset network configurations to fix persistent connectivity issues",
+        "qna_description": "Reset all network settings to fix no service or connection errors",
+        "classes": "ResetNetworkSettingsActivity",
+        "controlType": "button",
+        "category": "critical"
+    },
+    {
+        "id": "dl_reset_factory_01",
+        "uri": "bixby://com.samsung.android.settings.reset/FactoryDataResetActivity",
+        "name": "Factory Data Reset",
+        "description": "Erase all data and reset phone to original factory default settings",
+        "message": "Completely wipe device storage and restore initial factory image",
+        "qna_description": "Perform full factory reset as last resort",
+        "classes": "FactoryDataResetActivity",
+        "controlType": "button",
+        "category": "critical"
+    }
+]

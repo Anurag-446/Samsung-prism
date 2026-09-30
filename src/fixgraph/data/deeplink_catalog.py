@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional
+
 from fixgraph.data.fingerprints import compute_sha256_json
 
 
@@ -37,16 +38,41 @@ class DeeplinkRecord:
 
 
 class DeeplinkCatalog:
-    def __init__(self, records: List[DeeplinkRecord]):
+    def __init__(
+        self,
+        records: List[DeeplinkRecord],
+        source_path: str = "",
+        source_sha256: str = "",
+        is_test_fixture: bool = False,
+    ):
         self._records_by_id: Dict[str, DeeplinkRecord] = {r.record_id: r for r in records}
         self._records_list: List[DeeplinkRecord] = list(records)
         self._fingerprint = compute_sha256_json(
             [{"id": r.record_id, "uri": r.uri, "name": r.name} for r in self._records_list]
         )
+        self._source_path = source_path
+        self._source_sha256 = source_sha256
+        self._is_test_fixture = is_test_fixture
 
     @property
     def fingerprint(self) -> str:
         return self._fingerprint
+
+    @property
+    def source_path(self) -> str:
+        return self._source_path
+
+    @property
+    def source_sha256(self) -> str:
+        return self._source_sha256
+
+    @property
+    def is_test_fixture(self) -> bool:
+        return self._is_test_fixture
+
+    @property
+    def record_count(self) -> int:
+        return len(self._records_list)
 
     def __len__(self) -> int:
         return len(self._records_list)

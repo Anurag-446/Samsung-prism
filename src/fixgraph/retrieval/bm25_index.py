@@ -2,7 +2,9 @@
 
 import re
 from typing import List, Tuple
+
 from rank_bm25 import BM25Okapi
+
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 
 

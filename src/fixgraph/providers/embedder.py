@@ -1,21 +1,18 @@
 """Embedding provider interface with lightweight CPU fallback and sentence-transformers support."""
 
-import math
 import re
 from typing import List, Protocol
+
 import numpy as np
 
 
 class EmbedderProtocol(Protocol):
     @property
-    def model_fingerprint(self) -> str:
-        ...
+    def model_fingerprint(self) -> str: ...
 
-    def encode_single(self, text: str) -> List[float]:
-        ...
+    def encode_single(self, text: str) -> List[float]: ...
 
-    def encode_batch(self, texts: List[str]) -> List[List[float]]:
-        ...
+    def encode_batch(self, texts: List[str]) -> List[List[float]]: ...
 
 
 class LightweightEmbedder:

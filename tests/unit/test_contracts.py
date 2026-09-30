@@ -2,6 +2,7 @@
 
 import pytest
 from pydantic import ValidationError
+
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
@@ -29,7 +30,9 @@ def test_goal_validation_success():
         steps=[StepGroup(step="Tap Battery Protection in Settings")],
         category=CategoryEnum.AUTO,
         deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.battery/BatteryProtectionActivity")
+            baseDeeplink=BaseDeeplink(
+                uri="bixby://com.samsung.android.settings.battery/BatteryProtectionActivity"
+            )
         ),
     )
     goal = Goal(

@@ -2,6 +2,7 @@
 
 import re
 from typing import List, Optional
+
 from fixgraph.contracts.internal import EvidenceSpan
 
 

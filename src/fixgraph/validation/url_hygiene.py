@@ -2,8 +2,8 @@
 
 import re
 from typing import List
-from fixgraph.contracts.internal import ValidationIssue
 
+from fixgraph.contracts.internal import ValidationIssue
 
 # Regex patterns matching web URLs, markdown links, HTML hrefs, and common obfuscations
 URL_PATTERNS = [

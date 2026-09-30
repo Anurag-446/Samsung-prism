@@ -1,6 +1,7 @@
 """Risk and action sequencing validator enforcing safe execution ordering (P0-13)."""
 
 from typing import List
+
 from fixgraph.contracts.internal import ValidationIssue
 from fixgraph.contracts.public import CategoryEnum, Goal
 
