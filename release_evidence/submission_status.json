@@ -1,0 +1,10 @@
+{
+  "status": "SUBMISSION_READY",
+  "commit": "fab813bf4ffe7eff18d5ea21bb40aea75d7e5075",
+  "version": "1.0.0",
+  "manager_contract": true,
+  "jury_audit": true,
+  "docker": false,
+  "clean_room": true,
+  "blocking_issues": []
+}

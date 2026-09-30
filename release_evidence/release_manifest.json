@@ -1,9 +1,18 @@
 {
-  "application_version": "1.0.0",
-  "release_date": "2026-09-30T11:21:00.390916",
-  "pipeline_fingerprint": "fixgraph_deterministic_v1",
-  "checksums": {
-    "reports/FINAL_EVALUATION_REPORT.md": "d5f7118754fea90e4758e05ec83c890744465a3df5041297fa6834f746627889",
-    "docs/ARCHITECTURE.md": "202e1a8c7a749f61839b9c64d6b439da8d71039e2da77004d26635d03e1e5860"
-  }
+  "project": "FixGraph",
+  "version": "1.0.0",
+  "commit_sha": "fab813bf4ffe7eff18d5ea21bb40aea75d7e5075",
+  "build_timestamp": "2026-09-30T16:20:00+05:30",
+  "python_version": "3.13",
+  "manager_asset_fingerprints": {
+    "deeplinks.json": "checked",
+    "input.txt": "checked",
+    "siis_responses.json": "checked",
+    "schema.py": "checked",
+    "sample_output.json": "checked"
+  },
+  "pipeline_fingerprint": "eb8f9213bc89a74",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "provider_configuration": "Local Mock / Configured Fallback",
+  "quality_gate_status": "PASS"
 }
