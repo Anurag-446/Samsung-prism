@@ -46,7 +46,7 @@ for q in queries:
 
 with open('eval/cache/manager_paraphrases.json', 'w') as f:
     json.dump(paraphrases, f, indent=2)
-    
+
 with open('eval/cache/manager_hard_negatives.json', 'w') as f:
     json.dump(hard_negatives[:50], f, indent=2)
 

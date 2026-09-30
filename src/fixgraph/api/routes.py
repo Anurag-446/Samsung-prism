@@ -1,4 +1,6 @@
 """FastAPI route definitions for POST /v1/troubleshoot and GET /health (M6-01 & M6-02)."""
+import json
+
 from fastapi import APIRouter, Header, HTTPException, status
 from fastapi.responses import JSONResponse
 
@@ -10,7 +12,12 @@ from fixgraph.bootstrap import (
     get_mode,
 )
 from fixgraph.config import settings
-from fixgraph.contracts.public import Goal, HealthResponse, TroubleshootRequest
+from fixgraph.contracts.public import (
+    ContextDeeplinkResponse,
+    HealthResponse,
+    TroubleshootRequest,
+    TroubleshootResponse,
+)
 from fixgraph.observability.logging import logger
 from fixgraph.service.troubleshoot import TroubleshootService
 
@@ -52,8 +59,6 @@ def health_check():
         )
 
 
-from fixgraph.contracts.public import ContextDeeplinkResponse, TroubleshootResponse
-
 @router.post("/v1/troubleshoot", response_model=TroubleshootResponse, status_code=status.HTTP_200_OK)
 def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Header(None, alias="X-Request-ID")):
     """Main troubleshooting engine endpoint (P0-01).
@@ -85,7 +90,6 @@ def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Head
         outcome = service.troubleshoot(request)
         req_id = x_request_id or outcome.request_id
 
-        import json
         logger.info(json.dumps({
             "event": "api_request",
             "req_id": req_id,
@@ -143,4 +147,3 @@ def internal_troubleshoot_endpoint(request: TroubleshootRequest):
 
     outcome = service.troubleshoot(request)
     return outcome.model_dump()
-

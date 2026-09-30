@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     )
 
     env: str = "development"
+    # Allow FIXGRAPH_MODE env var as alias for backward compat
+    @property
+    def is_test_mode(self) -> bool:
+        import os
+        return self.env == "test" or os.environ.get("FIXGRAPH_MODE", "") == "test"
+
     log_level: str = "INFO"
     host: str = "0.0.0.0"
     port: int = 8000

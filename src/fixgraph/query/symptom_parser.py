@@ -20,14 +20,14 @@ class SymptomParser:
         fast_features = extract_fast_features(norm_query)
         domains = fast_features.probable_domains
         trigger = fast_features.trigger_terms[0] if fast_features.trigger_terms else None
-        
+
         # Keep deterministic symptoms from fast_features domains or keywords (since fast_features doesn't output symptoms)
         if any(w in text for w in ["drain", "draining", "drop", "dropping", "die", "dying"]):
             symptoms.append("battery_drain")
-        if any(w in text for w in ["connect", "connecting", "disconnect", "drop", "signal"]):
-            if "wi-fi" in domains or "wifi" in text:
+        if any(w in text for w in ["connect", "connecting", "disconnect", "drop", "signal", "fails", "fail", "broken", "not working", "issue", "problem"]):
+            if "wi-fi" in domains or "wifi" in text.lower() or "wi-fi" in text.lower():
                 symptoms.append("wifi_disconnection")
-            if "bluetooth" in domains or "bt" in text:
+            if "bluetooth" in domains or "bt" in text or "bluetooth" in text.lower():
                 symptoms.append("bluetooth_pairing_failure")
         if any(w in text for w in ["location", "gps", "map", "accuracy"]):
             symptoms.append("location_inaccuracy")

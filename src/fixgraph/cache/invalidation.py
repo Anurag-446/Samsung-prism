@@ -50,7 +50,7 @@ class CacheCompatibilityValidator:
         PHONE_GROUP = {"galaxy", "galaxy flagship", "phone", "tablet", "smartphone"}
         WEARABLE_GROUP = {"watch", "galaxy watch"}
         ACCESSORY_GROUP = {"earbuds", "buds", "headphones", "accessory"}
-        
+
         def _device_group(dev: str) -> str:
             if dev in PHONE_GROUP:
                 return "phone"
@@ -59,7 +59,7 @@ class CacheCompatibilityValidator:
             if dev in ACCESSORY_GROUP:
                 return "accessory"
             return dev  # exact match required for unknown families
-        
+
         if current_signature.device_family != cached_signature.device_family:
             cur_grp = _device_group(current_signature.device_family)
             cached_grp = _device_group(cached_signature.device_family)

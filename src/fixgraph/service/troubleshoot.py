@@ -21,7 +21,6 @@ from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 from fixgraph.data.fingerprints import compute_sha256_string
 from fixgraph.evidence.resolver import EvidenceResolver
 from fixgraph.evidence.retriever import LocalEvidenceRetriever
-from fixgraph.retrieval.screen_resolver import ScreenResolver
 from fixgraph.observability.logging import logger
 from fixgraph.planning.action_extractor import ActionExtractor
 from fixgraph.planning.compiler import PlanCompiler
@@ -30,9 +29,10 @@ from fixgraph.planning.risk import RiskClassifier
 from fixgraph.planning.sequencing import ActionSequencer
 from fixgraph.providers.exceptions import ProviderError
 from fixgraph.query.case_signature import CaseSignatureGenerator
-from fixgraph.query.normalizer import QueryNormalizer
 from fixgraph.query.fast_features import extract_fast_features
+from fixgraph.query.normalizer import QueryNormalizer
 from fixgraph.query.symptom_parser import SymptomParser
+from fixgraph.retrieval.screen_resolver import ScreenResolver
 from fixgraph.validation.fallback import get_safe_fallback_goal
 from fixgraph.validation.final_gate import (
     DeeplinkIntegrityValidator,
@@ -179,12 +179,14 @@ class TroubleshootService:
             logger.error(f"[req_id={req_id}] FALLBACK VALIDATION FAILED! {fb_report.errors}")
             return None
 
-        # 4. Two-stage fast-path cache lookup
-        cache_entry, sim_score, match_reason = self.cache_matcher.lookup(
-            signature=signature,
-            query=norm_query.clean_query,
-            runtime_fingerprint=runtime_fp,
-        )
+        # 4. Two-stage fast-path cache lookup (skipped if cache_enabled=False)
+        cache_entry, sim_score, match_reason = None, 0.0, "cache_disabled"
+        if settings.cache_enabled:
+            cache_entry, sim_score, match_reason = self.cache_matcher.lookup(
+                signature=signature,
+                query=norm_query.clean_query,
+                runtime_fingerprint=runtime_fp,
+            )
 
         if cache_entry:
             # FAST PATH CACHE HIT (<300ms)
@@ -219,8 +221,9 @@ class TroubleshootService:
         if not evidence_spans:
             logger.warning(f"[req_id={req_id}] No SIIS evidence found and cache miss. Skipping model generation.")
             metrics.total_latency_ms = round((time.time() - start_ts) * 1000.0, 2)
-            # Manager-mode no-SIIS miss must result in: goal = None
-            return TroubleshootOutcome(request_id=req_id, status="success", goal=None, source="no_evidence", metrics=metrics)
+            # Return a contract-safe fallback goal (no_evidence path)
+            fb_goal = get_safe_fallback_goal("no_evidence")
+            return TroubleshootOutcome(request_id=req_id, status="success", goal=fb_goal, source="no_evidence", metrics=metrics)
 
         try:
             metrics.llm_called = True

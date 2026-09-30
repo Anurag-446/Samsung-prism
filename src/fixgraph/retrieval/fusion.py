@@ -49,28 +49,28 @@ class HybridFusion:
         for rec_id, rec in records_map.items():
             bm_s = bm25_score_map.get(rec_id, 0.0)
             dn_s = dense_score_map.get(rec_id, 0.0)
-            
+
             norm_bm25 = bm_s / max_bm25
-            
+
             # Base combination
             base_score = (norm_bm25 * 0.4) + (dn_s * 0.6)
-            
+
             # Metadata heuristics
             searchable_text = rec.get_searchable_text().lower()
             q_lower = query.lower()
-            
+
             bonus = 0.0
-            
+
             if rec.name.lower() in q_lower or q_lower in rec.name.lower():
                 bonus += 0.15
             if rec.original_type and rec.original_type.lower() in q_lower:
                 bonus += 0.05
             if rec.validation and rec.validation.get("key") and str(rec.validation.get("key")).lower() in q_lower:
                 bonus += 0.05
-                
+
             if "general" in rec.name.lower() or "misc" in rec.name.lower():
                 bonus -= 0.1
-                
+
             conf = min(max(base_score + bonus, 0.0), 1.0)
 
             candidates.append(

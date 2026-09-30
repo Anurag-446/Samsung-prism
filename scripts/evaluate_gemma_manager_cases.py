@@ -1,10 +1,11 @@
 import json
-import os
 import time
-from fixgraph.contracts.public import TroubleshootRequest
-from fixgraph.service.troubleshoot import TroubleshootService
+
 from fixgraph.bootstrap import build_catalog, build_challenge_assets
 from fixgraph.config import settings
+from fixgraph.contracts.public import TroubleshootRequest
+from fixgraph.service.troubleshoot import TroubleshootService
+
 
 def main():
     print("Starting main()")
@@ -25,22 +26,22 @@ def main():
 
     from fixgraph.data.manager_cases import load_manager_cases
     cases = load_manager_cases("manager_assets/Theme 2/input.txt", "manager_assets/Theme 2/siis_responses.json")
-        
+
     report = []
-    
+
     for case in cases:
         req = TroubleshootRequest(query=case.query, siis_response=case.siis.content if case.siis else None)
         start_t = time.time()
         outcome = service.troubleshoot(req)
         latency = (time.time() - start_t) * 1000
-        
+
         report.append({
             "case": case.query,
             "actions": len(outcome.goal.actions) if outcome.goal else 0,
             "source": outcome.source,
             "latency": latency
         })
-            
+
     with open("reports/phase14/gemma_metrics.json", "w") as f:
         json.dump({
             "model_loaded": True,
@@ -53,7 +54,7 @@ def main():
             "model_generate_calls": provider.call_count,
             "results": report
         }, f, indent=2)
-        
+
     print("Done")
 
 if __name__ == "__main__":

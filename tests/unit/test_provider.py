@@ -17,20 +17,23 @@ def test_mock_provider_selected():
     assert provider.provider_id == "mock"
 
 def test_live_provider_selected():
-    settings = Settings(llm_provider="openai", llm_api_key="test-key")
+    # Must use env="production" to bypass test-mode mock override
+    settings = Settings(llm_provider="openai", llm_api_key="test-key", env="production")
     provider = create_llm_provider(settings)
     assert isinstance(provider, LiveLLMProvider)
     assert provider.provider_id == "openai"
     assert provider.api_key == "test-key"
 
 def test_live_provider_missing_key():
-    settings = Settings(llm_provider="openai", llm_api_key="")
+    # Must use env="production" to bypass test-mode mock override
+    settings = Settings(llm_provider="openai", llm_api_key="", env="production")
     with pytest.raises(ProviderError) as excinfo:
         create_llm_provider(settings)
     assert "API key is required" in str(excinfo.value)
 
 def test_invalid_provider_fails():
-    settings = Settings(llm_provider="unknown")
+    # Must use env="production" to bypass test-mode mock override
+    settings = Settings(llm_provider="unknown", env="production")
     with pytest.raises(ProviderError):
         create_llm_provider(settings)
 

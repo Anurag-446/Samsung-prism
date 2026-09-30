@@ -9,7 +9,9 @@ from fixgraph.providers.mock import MockLLMProvider
 
 def create_llm_provider(settings: Settings) -> LLMProvider:
     provider_name = settings.llm_provider.lower()
-    if provider_name == "mock":
+    # Always use mock in test mode to avoid loading heavy ML models in CI.
+    # Respect explicit env="production" as an override (for provider unit tests).
+    if (settings.is_test_mode and settings.env != "production") or provider_name == "mock":
         return MockLLMProvider()
     elif provider_name == "gemma_local":
         from fixgraph.providers.gemma import GemmaLocalProvider

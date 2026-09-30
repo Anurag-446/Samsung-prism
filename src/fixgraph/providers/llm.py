@@ -2,17 +2,27 @@
 
 from typing import List
 
-from fixgraph.contracts.internal import CandidateAction, EvidenceSpan, RiskTier, SymptomAtom
+from fixgraph.contracts.internal import (
+    CandidateAction,
+    CandidateActionExtractionResult,
+    EvidenceSpan,
+    RiskTier,
+    SymptomAtom,
+    SymptomExtractionResult,
+)
 
 
 class MockLLMProvider:
     """Deterministic Mock LLM Provider for unit tests and local pipeline execution."""
-    
+
     def __init__(self):
         self.call_count = 0
 
-    def extract_symptoms(self, query: str, evidence_spans: List[EvidenceSpan] = None) -> "SymptomExtractionResult":
-        from fixgraph.contracts.internal import SymptomExtractionResult, ExtractedSymptom, UserConstraints
+    def extract_symptoms(self, query: str, evidence_spans: List[EvidenceSpan] = None) -> SymptomExtractionResult:
+        from fixgraph.contracts.internal import (
+            ExtractedSymptom,
+            UserConstraints,
+        )
         self.call_count += 1
         prohibited = ["reset"] if "reset" in query else []
         completed = ["restart"] if "restarted" in query else []
@@ -28,8 +38,7 @@ class MockLLMProvider:
 
     def extract_candidate_actions(
         self, query: str, atom: SymptomAtom, evidence_spans: List[EvidenceSpan]
-    ) -> "CandidateActionExtractionResult":
-        from fixgraph.contracts.internal import CandidateActionExtractionResult
+    ) -> CandidateActionExtractionResult:
         self.call_count += 1
         actions: List[CandidateAction] = []
         ev_ids = [e.evidence_id for e in evidence_spans] or ["ev_default"]

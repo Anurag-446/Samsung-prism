@@ -5,9 +5,10 @@ import sys
 # Add src to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
+from fixgraph.navigation.resolver import NavigationAwareScreenResolver
+
 from fixgraph.bootstrap import build_catalog, build_challenge_assets
 from fixgraph.config import settings
-from fixgraph.navigation.resolver import NavigationAwareScreenResolver
 
 
 def main():

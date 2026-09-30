@@ -1,5 +1,7 @@
 """Main FastAPI application entrypoint for FixGraph."""
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -28,9 +30,6 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 app.include_router(router)
-
-
-from pathlib import Path
 
 
 @app.get("/", response_class=HTMLResponse)

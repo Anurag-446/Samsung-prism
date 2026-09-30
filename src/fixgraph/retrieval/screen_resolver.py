@@ -36,7 +36,7 @@ class ScreenResolver:
             if record and record.original_type:
                 o_type = record.original_type.lower()
                 i_text = intent_text.lower()
-                
+
                 # Intent semantic detection bonuses
                 bonus = 0.0
                 if o_type == "onurl" and any(w in i_text for w in ["enable", "turn on", "activate", "switch on"]):
@@ -47,18 +47,18 @@ class ScreenResolver:
                     bonus = 0.05
                 elif o_type == "updateurl" and any(w in i_text for w in ["change", "update", "modify", "set", "adjust"]):
                     bonus = 0.05
-                
+
                 score += bonus
             reranked.append((c, score))
-            
+
         reranked.sort(key=lambda x: x[1], reverse=True)
         top1_tuple = reranked[0]
         top1_cand = top1_tuple[0]
         top1_score = top1_tuple[1]
-        
+
         if top1_score < self.min_confidence:
             return None
-            
+
         if len(reranked) > 1:
             top2_score = reranked[1][1]
             if (top1_score - top2_score) < self.min_margin:

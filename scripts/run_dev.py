@@ -14,10 +14,10 @@ def main():
 
     # 2. Check dependencies
     try:
-        import fastapi
-        import uvicorn
+        import fastapi  # noqa: F401
+        import uvicorn  # noqa: F401
 
-        import fixgraph
+        import fixgraph  # noqa: F401
     except ImportError as e:
         print(f"[ERROR] Missing dependency: {e}")
         print("Run: pip install -e \".[dev]\"")

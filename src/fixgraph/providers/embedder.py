@@ -5,9 +5,9 @@ from typing import List, Protocol
 
 import numpy as np
 
-
 from fixgraph.config import settings
 from fixgraph.providers.exceptions import EmbedderInitializationError
+
 
 class EmbedderProtocol(Protocol):
     @property

@@ -1,14 +1,16 @@
 import json
 import os
+
 from fixgraph.data.manager_cases import load_manager_cases
+
 
 def main():
     cases = load_manager_cases("manager_assets/Theme 2/input.txt", "manager_assets/Theme 2/siis_responses.json")
     os.makedirs("eval/cache", exist_ok=True)
-    
+
     paraphrases = []
     hard_negatives = []
-    
+
     for case in cases:
         query = case.query
         # 5 Paraphrases
@@ -37,7 +39,7 @@ def main():
             "query": f"Fix issue: {query.lower()}",
             "expected_hit": True
         })
-        
+
         # Hard Negatives (similar wording, different intent or domain)
         hard_negatives.append({
             "case_id": case.case_id,
@@ -49,13 +51,13 @@ def main():
             "query": f"Does the warranty cover if {query.lower()}?",
             "expected_hit": False
         })
-        
+
     with open("eval/cache/manager_paraphrases.json", "w") as f:
         json.dump(paraphrases, f, indent=2)
-        
+
     with open("eval/cache/manager_hard_negatives.json", "w") as f:
         json.dump(hard_negatives, f, indent=2)
-        
+
     print("Generated eval datasets in eval/cache/")
 
 if __name__ == "__main__":
