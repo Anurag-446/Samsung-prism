@@ -3,11 +3,10 @@ import pytest
 from fixgraph.contracts.internal import CaseSignature, ValidationContext
 from fixgraph.contracts.public import (
     Action,
-    BaseDeeplink,
-    actionCategory,
     Goal,
     StepGroup,
     ValidationDeepLink,
+    actionCategory,
 )
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 from fixgraph.validation.final_gate import (
@@ -83,7 +82,7 @@ def test_compiler_blocks_unauthorized_deeplink(gate, val_ctx):
             actionName="Open Settings",
             description="It will open the settings menu",
             stepGroups=[StepGroup(
-                steps=["Do this"], 
+                steps=["Do this"],
                 validationDeeplink=ValidationDeepLink(deeplink="bixby://fake/uri", key="dummy")
             )],
             category=actionCategory.auto,
@@ -103,7 +102,7 @@ def test_compiler_blocks_risk_inversion(gate, val_ctx):
                 actionName="Critical Reset",
                 description="It will reset all data correctly",
                 stepGroups=[StepGroup(
-                    steps=["Do this"], 
+                    steps=["Do this"],
                     validationDeeplink=ValidationDeepLink(deeplink="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity", key="dummy")
                 )],
                 category=actionCategory.critical,
@@ -112,7 +111,7 @@ def test_compiler_blocks_risk_inversion(gate, val_ctx):
                 actionName="Auto Setting",
                 description="It will open the settings menu",
                 stepGroups=[StepGroup(
-                    steps=["Do that"], 
+                    steps=["Do that"],
                     validationDeeplink=ValidationDeepLink(deeplink="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity", key="dummy")
                 )],
                 category=actionCategory.auto,

@@ -2,7 +2,7 @@
 
 from typing import List, Tuple
 
-from fixgraph.contracts.public import Action, actionCategory, Goal
+from fixgraph.contracts.public import Action, Goal, actionCategory
 from fixgraph.validation.pipeline import ValidationPipeline
 
 

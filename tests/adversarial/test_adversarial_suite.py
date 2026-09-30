@@ -6,7 +6,7 @@ import pytest
 os.environ["FIXGRAPH_MODE"] = "test"
 os.environ["DEEPLINKS_PATH"] = "tests/fixtures/challenge_assets/deeplinks.json"
 
-from fixgraph.contracts.public import actionCategory, TroubleshootRequest
+from fixgraph.contracts.public import TroubleshootRequest, actionCategory
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.service.troubleshoot import TroubleshootService
 

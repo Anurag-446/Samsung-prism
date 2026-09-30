@@ -2,11 +2,10 @@
 
 from fixgraph.contracts.public import (
     Action,
-    BaseDeeplink,
-    actionCategory,
     Goal,
     StepGroup,
     ValidationDeepLink,
+    actionCategory,
 )
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.validation.deeplink_integrity import DeeplinkIntegrityValidator

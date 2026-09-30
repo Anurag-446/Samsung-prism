@@ -3,7 +3,7 @@ import re
 from typing import List, Protocol
 
 from fixgraph.contracts.internal import FinalValidationResult, ValidationContext, ValidationIssue
-from fixgraph.contracts.public import actionCategory, Goal
+from fixgraph.contracts.public import Goal, actionCategory
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 
 

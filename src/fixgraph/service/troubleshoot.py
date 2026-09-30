@@ -21,6 +21,7 @@ from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 from fixgraph.data.fingerprints import compute_sha256_string
 from fixgraph.evidence.resolver import EvidenceResolver
 from fixgraph.evidence.retriever import LocalEvidenceRetriever
+from fixgraph.navigation.resolver import NavigationAwareScreenResolver as ScreenResolver
 from fixgraph.observability.logging import logger
 from fixgraph.planning.action_extractor import ActionExtractor
 from fixgraph.planning.compiler import PlanCompiler
@@ -31,7 +32,6 @@ from fixgraph.providers.exceptions import ProviderError
 from fixgraph.query.case_signature import CaseSignatureGenerator
 from fixgraph.query.normalizer import QueryNormalizer
 from fixgraph.query.symptom_parser import SymptomParser
-from fixgraph.navigation.resolver import NavigationAwareScreenResolver as ScreenResolver
 from fixgraph.validation.fallback import get_safe_fallback_goal
 from fixgraph.validation.final_gate import (
     DeeplinkIntegrityValidator,

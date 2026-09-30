@@ -2,9 +2,9 @@
 
 from fixgraph.contracts.public import (
     Action,
-    actionCategory,
     Goal,
     StepGroup,
+    actionCategory,
 )
 
 
@@ -12,12 +12,12 @@ def get_safe_fallback_goal(reason: str = "general_fallback") -> Goal:
     """Generate a contract-safe, schema-valid fallback Goal response."""
     title = "Troubleshoot unknown issue"
     desc = "It will guide you to manual support"
-    
+
     # Needs to match StepGroup(steps=[...])
     step_groups = [
         StepGroup(steps=["Open the Samsung Members application", "Navigate to the Get Help section", "Contact customer support for assistance"])
     ]
-    
+
     goal_stmt = "Follow these steps to perform this Support Troubleshooting"
 
     if reason == "no_evidence":

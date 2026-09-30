@@ -5,12 +5,11 @@ from pydantic import ValidationError
 
 from fixgraph.contracts.public import (
     Action,
-    BaseDeeplink,
-    actionCategory,
     Goal,
     StepGroup,
     TroubleshootRequest,
     ValidationDeepLink,
+    actionCategory,
 )
 
 

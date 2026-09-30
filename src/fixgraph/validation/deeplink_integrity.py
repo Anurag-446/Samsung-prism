@@ -3,7 +3,7 @@
 from typing import List
 
 from fixgraph.contracts.internal import ValidationIssue
-from fixgraph.contracts.public import actionCategory, Goal
+from fixgraph.contracts.public import Goal, actionCategory
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 
 

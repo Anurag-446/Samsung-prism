@@ -1,10 +1,12 @@
 """Action evidence support checker to ensure semantic grounding."""
 
 from typing import Dict
+
 import numpy as np
 
 from fixgraph.contracts.internal import CandidateAction, EvidenceSpan
 from fixgraph.providers.embedder import get_embedder
+
 
 class EvidenceSupportChecker:
     def __init__(self, threshold: float = 0.35):
@@ -36,7 +38,7 @@ class EvidenceSupportChecker:
 
         if not valid_ev_spans:
             return 0.0
-            
+
         action_text = f"{action.intent} " + " ".join(action.steps)
         action_vec = np.array(self.embedder.encode_single(action_text), dtype=np.float32)
 
@@ -55,7 +57,7 @@ class EvidenceSupportChecker:
             sim = float(np.dot(action_vec, ev_vec))
             if sim > max_similarity:
                 max_similarity = sim
-                
+
         if max_similarity < self.threshold:
             return 0.0
 

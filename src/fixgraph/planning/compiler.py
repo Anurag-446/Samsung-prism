@@ -5,13 +5,13 @@ from typing import List
 from fixgraph.contracts.internal import ResolvedAction, SymptomAtom
 from fixgraph.contracts.public import (
     Action,
+    Condition,
     Deeplink,
-    actionCategory,
     Goal,
     ResultTypes,
-    Condition,
     StepGroup,
     ValidationDeepLink,
+    actionCategory,
 )
 from fixgraph.query.paraphrase import ParaphraseGenerator
 
@@ -53,13 +53,13 @@ class PlanCompiler:
         title_phrase = _format_title(f"Fix {primary_domain.lower()}")
 
         compiled_actions: List[Action] = []
-        
+
         for ra in resolved_actions:
             cat_enum = actionCategory(ra.category)
-            
+
             actionable_dl = None
             validation_dl = None
-            
+
             if cat_enum != actionCategory.manual and ra.exact_uri and catalog:
                 record = catalog.get_by_id(ra.catalog_record_id) if ra.catalog_record_id else None
                 if record:
@@ -76,10 +76,10 @@ class PlanCompiler:
                         val = record.validation
                         result_type = val.get("resultType")
                         val_res = ResultTypes(result_type) if result_type else None
-                        
+
                         cond = val.get("condition")
                         val_cond = Condition(cond) if cond else None
-                        
+
                         validation_dl = ValidationDeepLink(
                             deeplink=val.get("deeplink", ""),
                             key=val.get("key", ""),

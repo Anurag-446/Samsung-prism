@@ -17,7 +17,6 @@ from fixgraph.contracts.internal import (
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
-    actionCategory,
     Condition,
     Goal,
     HealthResponse,
@@ -25,6 +24,7 @@ from fixgraph.contracts.public import (
     StepGroup,
     TroubleshootRequest,
     ValidationDeepLink,
+    actionCategory,
 )
 
 __all__ = [

@@ -9,12 +9,13 @@ from fixgraph.bootstrap import build_catalog, build_challenge_assets
 from fixgraph.config import settings
 from fixgraph.navigation.resolver import NavigationAwareScreenResolver
 
+
 def main():
     assets = build_challenge_assets(settings, "development")
     catalog = build_catalog(settings, assets, "development")
-    
+
     resolver = NavigationAwareScreenResolver(catalog)
-    
+
     test_queries = [
         ("Wi-Fi network drops", "dl_wifi_01", True),
         ("Turn on bluetooth", "dl_bluetooth_01", True),
@@ -23,7 +24,7 @@ def main():
         ("How do I clean my phone?", None, False),
         ("My camera is broken", None, False)
     ]
-    
+
     print("Testing fusion thresholds:")
     for query, expected_id, should_match in test_queries:
         top = resolver.resolve_action_intent(query)

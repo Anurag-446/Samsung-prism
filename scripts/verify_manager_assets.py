@@ -1,8 +1,8 @@
-import os
-import json
 import hashlib
-from collections import Counter
+import json
+import os
 import sys
+
 
 def sha256_file(path):
     h = hashlib.sha256()
@@ -14,14 +14,14 @@ def sha256_file(path):
 def main():
     manager_dir = os.path.abspath("manager_assets/Theme 2")
     files_to_check = ["input.txt", "siis_responses.json", "deeplinks.json", "schema.py", "sample_output.json"]
-    
+
     for f in files_to_check:
         if not os.path.exists(os.path.join(manager_dir, f)):
             print(f"FATAL: Missing manager asset: {f}")
             sys.exit(1)
-            
+
     manifest = {}
-    
+
     # 1. input.txt
     input_path = os.path.join(manager_dir, "input.txt")
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -32,7 +32,7 @@ def main():
         "record_count": len(queries),
         "path": input_path
     }
-    
+
     # 2. siis_responses.json
     siis_path = os.path.join(manager_dir, "siis_responses.json")
     with open(siis_path, 'r', encoding='utf-8') as f:
@@ -43,16 +43,16 @@ def main():
         "record_count": len(siis_data),
         "path": siis_path
     }
-    
+
     # 3. deeplinks.json
     deeplinks_path = os.path.join(manager_dir, "deeplinks.json")
     with open(deeplinks_path, 'r', encoding='utf-8') as f:
         deeplinks_root = json.load(f)
         deeplinks_data = deeplinks_root.get("deeplinks", [])
-        
+
     ids = [d.get("id") for d in deeplinks_data]
     uris = [d.get("deeplink") for d in deeplinks_data if d.get("deeplink")]
-    
+
     manifest["deeplinks"] = {
         "filename": "deeplinks.json",
         "sha256": sha256_file(deeplinks_path),
@@ -61,7 +61,7 @@ def main():
         "unique_uris": len(set(uris)),
         "path": deeplinks_path
     }
-    
+
     # 4. sample_output.json
     sample_path = os.path.join(manager_dir, "sample_output.json")
     with open(sample_path, 'r', encoding='utf-8') as f:
@@ -72,7 +72,7 @@ def main():
         "record_count": len(sample_data.get("response", {}).get("contexts", [])),
         "path": sample_path
     }
-    
+
     # 5. schema.py
     schema_path = os.path.join(manager_dir, "schema.py")
     manifest["schema"] = {
@@ -81,11 +81,11 @@ def main():
         "record_count": 1,
         "path": schema_path
     }
-    
+
     os.makedirs("reports", exist_ok=True)
     with open("reports/manager_asset_manifest.json", "w") as f:
         json.dump(manifest, f, indent=2)
-        
+
     md = "# Manager Asset Manifest\n\n"
     for k, v in manifest.items():
         md += f"## {v['filename']}\n"
@@ -95,11 +95,11 @@ def main():
             md += f"- Unique IDs: {v['unique_ids']}\n"
             md += f"- Unique URIs: {v['unique_uris']}\n"
         md += "\n"
-        
+
     with open("reports/manager_asset_manifest.md", "w") as f:
         f.write(md)
-        
+
     print("All assets verified and manifest generated successfully.")
-    
+
 if __name__ == "__main__":
     main()

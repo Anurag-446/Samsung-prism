@@ -14,11 +14,10 @@ from fixgraph.contracts.internal import (
 )
 from fixgraph.contracts.public import (
     Action,
-    BaseDeeplink,
-    actionCategory,
     Goal,
     StepGroup,
     ValidationDeepLink,
+    actionCategory,
 )
 from fixgraph.query.case_signature import CaseSignatureGenerator
 

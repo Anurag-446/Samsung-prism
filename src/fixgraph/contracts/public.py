@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+
 # --- Manager Schema Core ---
 class BaseDeeplink(BaseModel):
     deeplink: str
