@@ -1,0 +1,14 @@
+{
+    "branch": "main",
+    "commit_sha": "88764275df730f49e7c3957dbc867c9f1731dbc0",
+    "commit_message": "Phase 8: Critical Remediation and Top-Tier Architecture",
+    "python_version": "3.13.1",
+    "platform": "windows",
+    "dependency_versions": {},
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "llm_provider": "local_mock",
+    "catalog_fingerprint": "observed",
+    "siis_fingerprint": "observed",
+    "schema_fingerprint": "observed",
+    "pipeline_fingerprint": "observed"
+}

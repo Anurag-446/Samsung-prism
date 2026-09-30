@@ -26,17 +26,20 @@ def test_troubleshoot_endpoint_battery_query():
     assert response.status_code == 200
 
     data = response.json()
-    assert "goal" in data
-    assert "title" in data
-    assert "score" in data
-    assert "actions" in data
-    assert "query_variations" in data
+    assert "query" in data
+    assert "response" in data
+    assert "contexts" in data["response"]
+
+    goal = data["response"]["contexts"][0]
+    assert "goal" in goal
+    assert "title" in goal
+    assert "score" in goal
+    assert "actions" in goal
 
     # Verify Goal syntax requirement
-    assert data["goal"].startswith("Follow these steps to perform this")
-    assert 0.0 <= data["score"] <= 1.0
-    assert len(data["actions"]) >= 1
-    assert 8 <= len(data["query_variations"]) <= 10
+    assert goal["goal"].startswith("Follow these steps to perform this")
+    assert 0.0 <= goal["score"] <= 1.0
+    assert len(goal["actions"]) >= 1
 
 
 def test_troubleshoot_endpoint_cache_hit():

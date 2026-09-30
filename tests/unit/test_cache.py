@@ -15,10 +15,10 @@ from fixgraph.contracts.internal import (
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
-    CategoryEnum,
+    actionCategory,
     Goal,
     StepGroup,
-    ValidationDeeplink,
+    ValidationDeepLink,
 )
 from fixgraph.query.case_signature import CaseSignatureGenerator
 
@@ -62,15 +62,18 @@ def test_case_cache_store_and_lookup():
         sig = sig_gen.generate_signature(atom)
 
         action = Action(
-            name="Location Settings",
+            actionName="Location Settings",
             description="It will enable location services accurately",
-            steps=[StepGroup(step="Toggle Location to ON")],
-            category=CategoryEnum.AUTO,
-            deeplink=ValidationDeeplink(
-                baseDeeplink=BaseDeeplink(
-                    uri="bixby://com.samsung.android.settings.location/LocationSettingsActivity"
+            stepGroups=[
+                StepGroup(
+                    steps=["Toggle Location to ON"],
+                    validationDeeplink=ValidationDeepLink(
+                        deeplink="bixby://com.samsung.android.settings.location/LocationSettingsActivity",
+                        key="dummy"
+                    )
                 )
-            ),
+            ],
+            category=actionCategory.auto,
         )
 
         goal = Goal(
@@ -78,7 +81,6 @@ def test_case_cache_store_and_lookup():
             title="Fix location accuracy",
             score=0.9,
             actions=[action],
-            query_variations=[f"var {i}" for i in range(8)],
         )
 
         catalog_fp = "test_catalog_fp_123"

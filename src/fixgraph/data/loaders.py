@@ -76,7 +76,7 @@ def load_deeplink_catalog(file_path: str | Path, is_test_fixture: bool = False) 
             raise CatalogValidationError(f"Duplicate record ID found: {rec_id}")
         seen_ids.add(rec_id)
 
-        uri = item.get("uri") or item.get("baseDeeplink", {}).get("uri", "")
+        uri = item.get("deeplink") or item.get("uri", "")
         if not uri:
             raise CatalogValidationError(f"Record '{rec_id}' is missing a deeplink URI")
 
@@ -90,14 +90,15 @@ def load_deeplink_catalog(file_path: str | Path, is_test_fixture: bool = False) 
             DeeplinkRecord(
                 record_id=rec_id,
                 uri=uri,
-                name=item.get("name") or item.get("title") or rec_id,
+                name=item.get("description", rec_id), # We use description as name for retrieval
                 description=item.get("description", ""),
                 message=item.get("message", ""),
                 qna_description=item.get("qna_description", ""),
                 classes=item.get("classes", ""),
-                control_type=item.get("controlType", ""),
+                control_type=str(item.get("control_type", "")),
                 original_type=item.get("originalType", ""),
-                category=item.get("category", "auto"),
+                category="manual" if item.get("originalType") is None else "auto",
+                validation=item.get("validation", None)
             )
         )
 

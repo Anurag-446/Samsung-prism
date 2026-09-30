@@ -2,7 +2,7 @@
 
 from typing import List, Tuple
 
-from fixgraph.contracts.public import Action, CategoryEnum, Goal
+from fixgraph.contracts.public import Action, actionCategory, Goal
 from fixgraph.validation.pipeline import ValidationPipeline
 
 
@@ -42,16 +42,16 @@ class DeterministicRepairPass:
 
             if act_repaired:
                 repaired = True
-                logs.append(f"Repaired description for action '{act.name}' -> '{desc}'")
+                logs.append(f"Repaired description for action '{act.actionName}' -> '{desc}'")
 
             repaired_actions.append(act.model_copy(update={"description": desc}))
 
         # 3. Action reordering (critical actions last)
-        non_critical = [a for a in repaired_actions if a.category != CategoryEnum.CRITICAL]
-        critical = [a for a in repaired_actions if a.category == CategoryEnum.CRITICAL]
+        non_critical = [a for a in repaired_actions if a.category != actionCategory.critical]
+        critical = [a for a in repaired_actions if a.category == actionCategory.critical]
         ordered_actions = non_critical + critical
 
-        if [a.name for a in ordered_actions] != [a.name for a in repaired_actions]:
+        if [a.actionName for a in ordered_actions] != [a.actionName for a in repaired_actions]:
             repaired = True
             logs.append("Reordered critical actions to the end")
 

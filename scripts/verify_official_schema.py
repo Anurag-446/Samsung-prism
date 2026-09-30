@@ -27,7 +27,7 @@ def check_schema():
         official_schema = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(official_schema)
 
-        expected_classes = ["Goal", "Action", "StepGroup", "ValidationDeeplink", "BaseDeeplink"]
+        expected_classes = ["Goal", "Action", "StepGroup", "ValidationDeepLink", "BaseDeeplink"]
         missing = []
         for c in expected_classes:
             if not hasattr(official_schema, c):

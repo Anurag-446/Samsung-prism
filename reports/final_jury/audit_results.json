@@ -1,0 +1,31 @@
+{
+  "manager_assets": {
+    "deeplink_count": 578,
+    "canonical_cases": 20,
+    "siis_count": 20
+  },
+  "golden_sample": "PASS",
+  "cold_latency": {
+    "samples": 20,
+    "P50": 0.0012860298156738281,
+    "P95": 0.002777099609375
+  },
+  "canonical_execution": {
+    "total": 20,
+    "failed": 0,
+    "passed": 20
+  },
+  "determinism": {
+    "unique_hashes": 10,
+    "samples": 10
+  },
+  "cache_latency": {
+    "samples": 20,
+    "P50": 0.0012218952178955078,
+    "P95": 0.004846096038818359
+  },
+  "semantic_hits": {
+    "attempted": 20,
+    "hits": 0
+  }
+}

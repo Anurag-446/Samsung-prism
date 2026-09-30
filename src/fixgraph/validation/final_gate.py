@@ -3,7 +3,7 @@ import re
 from typing import List, Protocol
 
 from fixgraph.contracts.internal import FinalValidationResult, ValidationContext, ValidationIssue
-from fixgraph.contracts.public import CategoryEnum, Goal
+from fixgraph.contracts.public import actionCategory, Goal
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog
 
 
@@ -86,35 +86,19 @@ class StepValidator(GoalValidator):
         issues = []
         for idx, act in enumerate(goal.actions):
             steps = set()
-            for s_idx, step in enumerate(act.steps):
-                s = step.step.strip()
-                if not s:
-                    issues.append(ValidationIssue(code="EMPTY_STEP", message="Step is empty", severity="ERROR", field=f"actions[{idx}].steps[{s_idx}]"))
-                # Detect leakage
-                lower_s = s.lower()
-                if "according to evidence" in lower_s or "confidence:" in lower_s:
-                    issues.append(ValidationIssue(code="INTERNAL_LEAK", message="Step contains internal reasoning", severity="ERROR", field=f"actions[{idx}].steps[{s_idx}]"))
-                # Duplicate step detection
-                if lower_s in steps:
-                    issues.append(ValidationIssue(code="DUPLICATE_STEP", message="Duplicate step", severity="ERROR", field=f"actions[{idx}].steps[{s_idx}]"))
-                steps.add(lower_s)
-        return issues
-
-class QueryVariationValidator(GoalValidator):
-    @property
-    def validator_id(self) -> str: return "query_variation"
-
-    def validate(self, goal: Goal, context: ValidationContext) -> List[ValidationIssue]:
-        issues = []
-        if len(goal.query_variations) < 8 or len(goal.query_variations) > 10:
-            issues.append(ValidationIssue(code="VAR_COUNT", message="Must have 8-10 variations", severity="ERROR", field="goal.query_variations"))
-
-        seen = set()
-        for i, var in enumerate(goal.query_variations):
-            norm = " ".join(var.lower().split())
-            if norm in seen:
-                issues.append(ValidationIssue(code="DUPLICATE_VARIATION", message=f"Duplicate variation: {norm}", severity="ERROR", field=f"query_variations[{i}]"))
-            seen.add(norm)
+            for sg_idx, sg in enumerate(act.stepGroups):
+                for s_idx, step_str in enumerate(sg.steps):
+                    s = step_str.strip()
+                    if not s:
+                        issues.append(ValidationIssue(code="EMPTY_STEP", message="Step is empty", severity="ERROR", field=f"actions[{idx}].stepGroups[{sg_idx}].steps[{s_idx}]"))
+                    # Detect leakage
+                    lower_s = s.lower()
+                    if "according to evidence" in lower_s or "confidence:" in lower_s:
+                        issues.append(ValidationIssue(code="INTERNAL_LEAK", message="Step contains internal reasoning", severity="ERROR", field=f"actions[{idx}].stepGroups[{sg_idx}].steps[{s_idx}]"))
+                    # Duplicate step detection
+                    if lower_s in steps:
+                        issues.append(ValidationIssue(code="DUPLICATE_STEP", message="Duplicate step", severity="ERROR", field=f"actions[{idx}].stepGroups[{sg_idx}].steps[{s_idx}]"))
+                    steps.add(lower_s)
         return issues
 
 class DeeplinkIntegrityValidator(GoalValidator):
@@ -128,22 +112,33 @@ class DeeplinkIntegrityValidator(GoalValidator):
         issues = []
         seen_uris = set()
         for idx, act in enumerate(goal.actions):
-            if act.category == CategoryEnum.MANUAL:
-                if act.deeplink is not None:
-                    issues.append(ValidationIssue(code="MANUAL_DEEPLINK", message="Manual action has deeplink", severity="ERROR", field=f"actions[{idx}].deeplink"))
+            field_prefix = f"actions[{idx}]"
+            has_deeplink = False
+            uri = None
+            if act.stepGroups and len(act.stepGroups) > 0:
+                sg = act.stepGroups[0]
+                if sg.actionableDeeplink or sg.validationDeeplink:
+                    has_deeplink = True
+                    if sg.actionableDeeplink:
+                        uri = sg.actionableDeeplink.deeplink
+                    elif sg.validationDeeplink:
+                        uri = sg.validationDeeplink.deeplink
+
+            if act.category == actionCategory.manual:
+                if has_deeplink:
+                    issues.append(ValidationIssue(code="MANUAL_DEEPLINK", message="Manual action has deeplink", severity="ERROR", field=f"{field_prefix}.stepGroups"))
                 continue
 
-            if act.deeplink is None:
-                issues.append(ValidationIssue(code="MISSING_DEEPLINK", message="Auto/Critical action missing deeplink", severity="ERROR", field=f"actions[{idx}].deeplink"))
+            if not has_deeplink or not uri:
+                issues.append(ValidationIssue(code="MISSING_DEEPLINK", message="Auto/Critical action missing deeplink", severity="ERROR", field=f"{field_prefix}.stepGroups"))
                 continue
 
-            uri = act.deeplink.baseDeeplink.uri
             if not self.catalog.exists_uri(uri):
-                issues.append(ValidationIssue(code="UNKNOWN_URI", message=f"URI not in catalog: {uri}", severity="ERROR", field=f"actions[{idx}].deeplink"))
+                issues.append(ValidationIssue(code="UNKNOWN_URI", message=f"URI not in catalog: {uri}", severity="ERROR", field=f"{field_prefix}.stepGroups"))
 
             # One action one screen validator
             if uri in seen_uris:
-                issues.append(ValidationIssue(code="DUPLICATE_SCREEN", message=f"Multiple actions point to same screen: {uri}", severity="ERROR", field=f"actions[{idx}].deeplink"))
+                issues.append(ValidationIssue(code="DUPLICATE_SCREEN", message=f"Multiple actions point to same screen: {uri}", severity="ERROR", field=f"{field_prefix}.stepGroups"))
             seen_uris.add(uri)
         return issues
 
@@ -155,9 +150,9 @@ class RiskOrderValidator(GoalValidator):
         issues = []
         found_critical = False
         for idx, act in enumerate(goal.actions):
-            if act.category == CategoryEnum.CRITICAL:
+            if act.category == actionCategory.critical:
                 found_critical = True
-            elif act.category == CategoryEnum.AUTO and found_critical:
+            elif act.category == actionCategory.auto and found_critical:
                 issues.append(ValidationIssue(code="RISK_ORDER", message="AUTO action follows CRITICAL action", severity="ERROR", field=f"actions[{idx}].category"))
         return issues
 
@@ -169,7 +164,7 @@ class UserConstraintValidator(GoalValidator):
         issues = []
         # Basic check
         for idx, act in enumerate(goal.actions):
-            act_text = f"{act.name} {act.description}".lower()
+            act_text = f"{act.actionName} {act.description}".lower()
             for prob in context.prohibited_actions:
                 if prob.lower() in act_text:
                     issues.append(ValidationIssue(code="PROHIBITED_ACTION", message=f"Action violates constraint: {prob}", severity="ERROR", field=f"actions[{idx}]"))
@@ -193,12 +188,11 @@ class URLLeakValidator(GoalValidator):
         check(goal.goal, "goal.goal")
         check(goal.title, "goal.title")
         for idx, act in enumerate(goal.actions):
-            check(act.name, f"actions[{idx}].name")
+            check(act.actionName, f"actions[{idx}].name")
             check(act.description, f"actions[{idx}].description")
-            for sidx, step in enumerate(act.steps):
-                check(step.step, f"actions[{idx}].steps[{sidx}].step")
-        for idx, var in enumerate(goal.query_variations):
-            check(var, f"query_variations[{idx}]")
+            for sg_idx, sg in enumerate(act.stepGroups):
+                for sidx, step_str in enumerate(sg.steps):
+                    check(step_str, f"actions[{idx}].stepGroups[{sg_idx}].steps[{sidx}]")
 
         return issues
 
@@ -210,7 +204,7 @@ class DuplicateActionValidator(GoalValidator):
         issues = []
         seen = set()
         for idx, act in enumerate(goal.actions):
-            norm_name = act.name.lower().strip()
+            norm_name = act.actionName.lower().strip()
             if norm_name in seen:
                 issues.append(ValidationIssue(code="DUPLICATE_ACTION", message=f"Duplicate action: {norm_name}", severity="ERROR", field=f"actions[{idx}]"))
             seen.add(norm_name)

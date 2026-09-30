@@ -105,8 +105,13 @@ def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Head
             )
 
         # Build response manually to include X-Request-ID
+        from fixgraph.contracts.public import TroubleshootResponse, ContextDeeplinkResponse
+        resp = TroubleshootResponse(
+            query=request.query,
+            response=ContextDeeplinkResponse(contexts=[outcome.goal])
+        )
         return JSONResponse(
-            content=outcome.goal.model_dump(),
+            content=resp.model_dump(),
             headers={"X-Request-ID": req_id}
         )
 

@@ -18,6 +18,7 @@ class DeeplinkRecord:
     control_type: str = ""
     original_type: str = ""
     category: str = "auto"  # "auto", "critical", "manual"
+    validation: Optional[Dict[str, str]] = None
 
     def get_searchable_text(self) -> str:
         """Build descriptive metadata document for retrieval.

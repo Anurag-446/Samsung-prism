@@ -17,14 +17,14 @@ from fixgraph.contracts.internal import (
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
-    CategoryEnum,
+    actionCategory,
     Condition,
     Goal,
     HealthResponse,
     ResultTypes,
     StepGroup,
     TroubleshootRequest,
-    ValidationDeeplink,
+    ValidationDeepLink,
 )
 
 __all__ = [
@@ -35,8 +35,8 @@ __all__ = [
     "Condition",
     "BaseDeeplink",
     "ResultTypes",
-    "ValidationDeeplink",
-    "CategoryEnum",
+    "ValidationDeepLink",
+    "actionCategory",
     "HealthResponse",
     "NormalizedQuery",
     "SymptomAtom",

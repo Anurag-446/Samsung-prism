@@ -4,10 +4,10 @@ from fixgraph.contracts.internal import CaseSignature, ValidationContext
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
-    CategoryEnum,
+    actionCategory,
     Goal,
     StepGroup,
-    ValidationDeeplink,
+    ValidationDeepLink,
 )
 from fixgraph.data.deeplink_catalog import DeeplinkCatalog, DeeplinkRecord
 from fixgraph.validation.final_gate import (
@@ -64,13 +64,11 @@ def test_compiler_blocks_url_leak(gate, val_ctx):
         title="Fix Issue",
         score=0.9,
         actions=[Action(
-            name="Check URL",
+            actionName="Check URL",
             description="It will check http://malicious.com",
-            steps=[StepGroup(step="Click link")],
-            category=CategoryEnum.MANUAL,
-            deeplink=None
-        )],
-        query_variations=["var 1", "var 2", "var 3", "var 4", "var 5", "var 6", "var 7", "var 8"]
+            stepGroups=[StepGroup(steps=["Click link"])],
+            category=actionCategory.manual,
+        )]
     )
     result = gate.validate(bad_goal, val_ctx)
     assert not result.valid
@@ -82,13 +80,14 @@ def test_compiler_blocks_unauthorized_deeplink(gate, val_ctx):
         title="Fix Issue",
         score=0.9,
         actions=[Action(
-            name="Open Settings",
+            actionName="Open Settings",
             description="It will open the settings menu",
-            steps=[StepGroup(step="Do this")],
-            category=CategoryEnum.AUTO,
-            deeplink=ValidationDeeplink(baseDeeplink=BaseDeeplink(uri="bixby://fake/uri"))
-        )],
-        query_variations=["var 1", "var 2", "var 3", "var 4", "var 5", "var 6", "var 7", "var 8"]
+            stepGroups=[StepGroup(
+                steps=["Do this"], 
+                validationDeeplink=ValidationDeepLink(deeplink="bixby://fake/uri", key="dummy")
+            )],
+            category=actionCategory.auto,
+        )]
     )
     result = gate.validate(bad_goal, val_ctx)
     assert not result.valid
@@ -101,23 +100,26 @@ def test_compiler_blocks_risk_inversion(gate, val_ctx):
         score=0.9,
         actions=[
             Action(
-                name="Critical Reset",
+                actionName="Critical Reset",
                 description="It will reset all data correctly",
-                steps=[StepGroup(step="Do this")],
-                category=CategoryEnum.CRITICAL,
-                deeplink=ValidationDeeplink(baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity"))
+                stepGroups=[StepGroup(
+                    steps=["Do this"], 
+                    validationDeeplink=ValidationDeepLink(deeplink="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity", key="dummy")
+                )],
+                category=actionCategory.critical,
             ),
             Action(
-                name="Auto Setting",
+                actionName="Auto Setting",
                 description="It will open the settings menu",
-                steps=[StepGroup(step="Do that")],
-                category=CategoryEnum.AUTO,
-                deeplink=ValidationDeeplink(baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity")) # Intentionally using same just to check risk order
+                stepGroups=[StepGroup(
+                    steps=["Do that"], 
+                    validationDeeplink=ValidationDeepLink(deeplink="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity", key="dummy")
+                )],
+                category=actionCategory.auto,
             )
-        ],
-        query_variations=["var 1", "var 2", "var 3", "var 4", "var 5", "var 6", "var 7", "var 8"]
+        ]
     )
     result = gate.validate(bad_goal, val_ctx)
+    print("RESULT ERRORS:", result.errors)
     assert not result.valid
     assert any(e.code == "RISK_ORDER" for e in result.errors)
-

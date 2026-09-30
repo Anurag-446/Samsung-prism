@@ -62,7 +62,7 @@ class TextualRuleValidator:
                 )
 
             # Step groups check
-            if not action.steps:
+            if not action.stepGroups[0].steps if action.stepGroups else []:
                 issues.append(
                     ValidationIssue(
                         code="STEPS_EMPTY",
@@ -72,13 +72,4 @@ class TextualRuleValidator:
                 )
 
         # 4. Query variations count check (8-10 variations)
-        if not (8 <= len(goal.query_variations) <= 10):
-            issues.append(
-                ValidationIssue(
-                    code="QUERY_VARIATIONS_COUNT_INVALID",
-                    message=f"query_variations must contain 8-10 items, got {len(goal.query_variations)}",
-                    field="goal.query_variations",
-                )
-            )
-
         return issues

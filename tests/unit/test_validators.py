@@ -3,10 +3,10 @@
 from fixgraph.contracts.public import (
     Action,
     BaseDeeplink,
-    CategoryEnum,
+    actionCategory,
     Goal,
     StepGroup,
-    ValidationDeeplink,
+    ValidationDeepLink,
 )
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.validation.deeplink_integrity import DeeplinkIntegrityValidator
@@ -32,15 +32,18 @@ def test_textual_rule_validator():
     validator = TextualRuleValidator()
 
     valid_action = Action(
-        name="Location Settings",
+        actionName="Location Settings",
         description="It will enable location services accurately",
-        steps=[StepGroup(step="Toggle Location switch to ON")],
-        category=CategoryEnum.AUTO,
-        deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(
-                uri="bixby://com.samsung.android.settings.location/LocationSettingsActivity"
+        stepGroups=[
+            StepGroup(
+                steps=["Toggle Location switch to ON"],
+                validationDeeplink=ValidationDeepLink(
+                    deeplink="bixby://com.samsung.android.settings.location/LocationSettingsActivity",
+                    key="dummy"
+                )
             )
-        ),
+        ],
+        category=actionCategory.auto,
     )
 
     valid_goal = Goal(
@@ -48,7 +51,6 @@ def test_textual_rule_validator():
         title="Fix location accuracy",
         score=0.9,
         actions=[valid_action],
-        query_variations=[f"var {i}" for i in range(8)],
     )
 
     issues = validator.validate_goal(valid_goal)
@@ -68,13 +70,18 @@ def test_deeplink_integrity_validator():
 
     # Fabricated deeplink
     fabricated_action = Action(
-        name="Unknown Settings",
+        actionName="Unknown Settings",
         description="It will open fake settings screen",
-        steps=[StepGroup(step="Tap unknown button")],
-        category=CategoryEnum.AUTO,
-        deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(uri="bixby://com.samsung.fake.settings/FakeActivity")
-        ),
+        stepGroups=[
+            StepGroup(
+                steps=["Tap unknown button"],
+                validationDeeplink=ValidationDeepLink(
+                    deeplink="bixby://com.samsung.fake.settings/FakeActivity",
+                    key="dummy"
+                )
+            )
+        ],
+        category=actionCategory.auto,
     )
 
     goal = Goal(
@@ -82,7 +89,6 @@ def test_deeplink_integrity_validator():
         title="Fix unknown issue",
         score=0.8,
         actions=[fabricated_action],
-        query_variations=[f"var {i}" for i in range(8)],
     )
 
     issues = validator.validate_goal(goal)
@@ -93,27 +99,33 @@ def test_risk_order_validator():
     validator = RiskOrderValidator()
 
     critical_action = Action(
-        name="Reset Mobile Network Settings",
+        actionName="Reset Mobile Network Settings",
         description="It will reset all network parameters",
-        steps=[StepGroup(step="Tap Reset Network Settings")],
-        category=CategoryEnum.CRITICAL,
-        deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(
-                uri="bixby://com.samsung.android.settings.reset/ResetNetworkSettingsActivity"
+        stepGroups=[
+            StepGroup(
+                steps=["Tap Reset Network Settings"],
+                validationDeeplink=ValidationDeepLink(
+                    deeplink="bixby://com.samsung.android.settings.reset/ResetNetworkSettingsActivity",
+                    key="dummy"
+                )
             )
-        ),
+        ],
+        category=actionCategory.critical,
     )
 
     auto_action = Action(
-        name="Wi-Fi Settings",
+        actionName="Wi-Fi Settings",
         description="It will connect to wireless network",
-        steps=[StepGroup(step="Tap Wi-Fi Settings")],
-        category=CategoryEnum.AUTO,
-        deeplink=ValidationDeeplink(
-            baseDeeplink=BaseDeeplink(
-                uri="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity"
+        stepGroups=[
+            StepGroup(
+                steps=["Tap Wi-Fi Settings"],
+                validationDeeplink=ValidationDeepLink(
+                    deeplink="bixby://com.samsung.android.settings.wifi/WifiSettingsActivity",
+                    key="dummy"
+                )
             )
-        ),
+        ],
+        category=actionCategory.auto,
     )
 
     # Invalid order: CRITICAL before AUTO
@@ -122,7 +134,6 @@ def test_risk_order_validator():
         title="Fix network connection",
         score=0.85,
         actions=[critical_action, auto_action],
-        query_variations=[f"var {i}" for i in range(8)],
     )
 
     issues = validator.validate_goal(bad_order_goal)

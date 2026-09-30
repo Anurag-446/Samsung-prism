@@ -6,7 +6,7 @@ import pytest
 os.environ["FIXGRAPH_MODE"] = "test"
 os.environ["DEEPLINKS_PATH"] = "tests/fixtures/challenge_assets/deeplinks.json"
 
-from fixgraph.contracts.public import CategoryEnum, TroubleshootRequest
+from fixgraph.contracts.public import actionCategory, TroubleshootRequest
 from fixgraph.data.loaders import load_deeplink_catalog
 from fixgraph.service.troubleshoot import TroubleshootService
 
@@ -74,18 +74,18 @@ def test_adversarial_contract_safety(query_text: str):
 
     # 4. Deeplink catalog integrity
     for act in goal.actions:
-        if act.category != CategoryEnum.MANUAL and act.deeplink:
-            uri = act.deeplink.baseDeeplink.uri
+        if act.category != actionCategory.manual and act.stepGroups and act.stepGroups[0].actionableDeeplink:
+            uri = act.stepGroups and act.stepGroups[0].actionableDeeplink.baseDeeplink.uri
             assert catalog.exists_uri(uri), f"Fabricated URI '{uri}' returned!"
-        elif act.category == CategoryEnum.MANUAL:
-            assert act.deeplink is None
+        elif act.category == actionCategory.manual:
+            assert act.stepGroups and act.stepGroups[0].actionableDeeplink is None
 
     # 5. Critical action sequencing order
     found_critical = False
     for act in goal.actions:
-        if act.category == CategoryEnum.CRITICAL:
+        if act.category == actionCategory.critical:
             found_critical = True
         elif found_critical:
-            assert act.category not in (CategoryEnum.AUTO, CategoryEnum.MANUAL), (
+            assert act.category not in (actionCategory.auto, actionCategory.manual), (
                 f"Non-critical action '{act.name}' found after critical action!"
             )
