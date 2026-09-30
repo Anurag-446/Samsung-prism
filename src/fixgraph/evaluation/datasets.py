@@ -2,7 +2,9 @@ import json
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
+
 
 class Severity(str, Enum):
     CRITICAL = "CRITICAL"

@@ -576,7 +576,7 @@
             const startTime = performance.now();
 
             try {
-                const response = await fetch('/v1/troubleshoot', {
+                const response = await fetch('/internal/troubleshoot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: query, siis_response: siis || null })

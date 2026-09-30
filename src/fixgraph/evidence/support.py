@@ -1,11 +1,16 @@
 """Action evidence support checker to ensure semantic grounding."""
 
 from typing import Dict
+import numpy as np
 
 from fixgraph.contracts.internal import CandidateAction, EvidenceSpan
-
+from fixgraph.providers.embedder import get_embedder
 
 class EvidenceSupportChecker:
+    def __init__(self, threshold: float = 0.35):
+        self.embedder = get_embedder()
+        self.threshold = threshold
+
     def score_action_support(
         self, action: CandidateAction, evidence_map: Dict[str, EvidenceSpan]
     ) -> float:
@@ -31,26 +36,27 @@ class EvidenceSupportChecker:
 
         if not valid_ev_spans:
             return 0.0
+            
+        action_text = f"{action.intent} " + " ".join(action.steps)
+        action_vec = np.array(self.embedder.encode_single(action_text), dtype=np.float32)
 
-        # For phase 2 deterministic validation: we trust the LLM's support_score if it passes existence checks
-        # But we ensure it meets the threshold
-        max_score = 0.0
-        if action.evidence_support:
-            for es in action.evidence_support:
-                if es.evidence_id in evidence_map:
-                    max_score = max(max_score, es.support_score)
-        else:
-            # If it only provided IDs but no structured score, assume 0.9 as placeholder
-            max_score = 0.9
-
-        # Detect contradictory evidence very naively for now (e.g., if there's "do not" in one evidence span and "do" in another)
-        # This will be hardened in later phases
+        # Detect contradictory evidence naively
         for ev in valid_ev_spans:
             text = ev.text_content.lower()
             if "do not" in text or "don't" in text or "avoid" in text:
                 action_intent_lower = action.intent.lower()
-                if any(w in text for w in action_intent_lower.split()):
+                if any(w in text for w in action_intent_lower.split() if len(w) > 3):
                     # Conflict detected
                     return 0.0
 
-        return max_score
+        max_similarity = 0.0
+        for ev in valid_ev_spans:
+            ev_vec = np.array(self.embedder.encode_single(ev.text_content), dtype=np.float32)
+            sim = float(np.dot(action_vec, ev_vec))
+            if sim > max_similarity:
+                max_similarity = sim
+                
+        if max_similarity < self.threshold:
+            return 0.0
+
+        return min(1.0, max_similarity)

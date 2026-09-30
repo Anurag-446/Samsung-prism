@@ -30,8 +30,8 @@ async def add_security_headers(request: Request, call_next):
 app.include_router(router)
 
 
-import os
 from pathlib import Path
+
 
 @app.get("/", response_class=HTMLResponse)
 def root_ui():
@@ -41,4 +41,3 @@ def root_ui():
         with open(template_path, "r", encoding="utf-8") as f:
             return f.read()
     return "<html><body><h1>FixGraph UI</h1><p>index.html not found.</p></body></html>"
-"""

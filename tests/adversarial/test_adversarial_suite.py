@@ -58,7 +58,6 @@ def test_adversarial_contract_safety(query_text: str):
     request = TroubleshootRequest(query=query_text)
     outcome = service.troubleshoot(request)
     goal = outcome.goal
-    metrics = outcome.metrics
 
     # 1. Zero URL Leak Check across all fields
     full_json_str = goal.model_dump_json()

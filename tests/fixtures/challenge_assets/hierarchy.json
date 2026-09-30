@@ -1,0 +1,18 @@
+{
+  "root": "dl_settings_root",
+  "nodes": {
+    "dl_settings_root": {
+      "id": "dl_settings_root",
+      "name": "Settings",
+      "children": ["dl_location_01", "dl_wifi_01", "dl_bluetooth_01", "dl_display_01", "dl_battery_01", "dl_apps_01", "dl_reset_network_01", "dl_reset_factory_01"]
+    },
+    "dl_location_01": { "id": "dl_location_01", "name": "Location Settings", "children": [] },
+    "dl_wifi_01": { "id": "dl_wifi_01", "name": "Wi-Fi Settings", "children": [] },
+    "dl_bluetooth_01": { "id": "dl_bluetooth_01", "name": "Bluetooth Settings", "children": [] },
+    "dl_display_01": { "id": "dl_display_01", "name": "Display Settings", "children": [] },
+    "dl_battery_01": { "id": "dl_battery_01", "name": "Battery Protection Settings", "children": [] },
+    "dl_apps_01": { "id": "dl_apps_01", "name": "Apps Management", "children": [] },
+    "dl_reset_network_01": { "id": "dl_reset_network_01", "name": "Reset Mobile Network Settings", "children": [] },
+    "dl_reset_factory_01": { "id": "dl_reset_factory_01", "name": "Factory Data Reset", "children": [] }
+  }
+}

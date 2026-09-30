@@ -13,11 +13,11 @@ def action_concept_match(expected_concepts: list[str], predicted_actions: list[s
     """
     if not expected_concepts and not predicted_actions:
         return (0, 0, 0)
-        
+
     tps = 0
     fps = 0
     fns = 0
-    
+
     # Very naive matching for automated evaluation:
     # If the predicted action's description or intent matches an expected concept string
     pred_text = " ".join([pa.lower() for pa in predicted_actions])
@@ -26,7 +26,7 @@ def action_concept_match(expected_concepts: list[str], predicted_actions: list[s
             tps += 1
         else:
             fns += 1
-            
+
     # Assuming any predicted action not containing ANY expected concept is a false positive
     for pa in predicted_actions:
         matched = False
@@ -36,5 +36,5 @@ def action_concept_match(expected_concepts: list[str], predicted_actions: list[s
                 break
         if not matched:
             fps += 1
-            
+
     return tps, fps, fns

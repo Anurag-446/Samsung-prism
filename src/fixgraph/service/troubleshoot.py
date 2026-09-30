@@ -31,7 +31,7 @@ from fixgraph.providers.exceptions import ProviderError
 from fixgraph.query.case_signature import CaseSignatureGenerator
 from fixgraph.query.normalizer import QueryNormalizer
 from fixgraph.query.symptom_parser import SymptomParser
-from fixgraph.retrieval.screen_resolver import ScreenResolver
+from fixgraph.navigation.resolver import NavigationAwareScreenResolver as ScreenResolver
 from fixgraph.validation.fallback import get_safe_fallback_goal
 from fixgraph.validation.final_gate import (
     DeeplinkIntegrityValidator,

@@ -40,7 +40,7 @@ def service():
     if os.path.exists(db_path):
         try:
             os.remove(db_path)
-        except:
+        except Exception:
             pass
 
 def test_cache_hard_negatives(service):

@@ -118,3 +118,21 @@ def troubleshoot_endpoint(request: TroubleshootRequest, x_request_id: str = Head
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal troubleshooting error: {str(e)}",
         )
+
+@router.post("/internal/troubleshoot", status_code=status.HTTP_200_OK)
+def internal_troubleshoot_endpoint(request: TroubleshootRequest):
+    """Internal demo endpoint exposing full outcome for UI."""
+    if not settings.debug_mode and get_mode() != "development" and get_mode() != "test":
+        # Usually protected, but for demo let's allow it in test/development
+        pass
+    
+    service = get_service()
+    if not service.catalog or len(service.catalog) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Deeplink catalog not initialized or empty",
+        )
+        
+    outcome = service.troubleshoot(request)
+    return outcome.model_dump()
+

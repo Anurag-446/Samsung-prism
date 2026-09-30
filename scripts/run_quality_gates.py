@@ -1,7 +1,7 @@
-import os
-import subprocess
 import datetime
+import subprocess
 from pathlib import Path
+
 
 def run_command(cmd, title, log_file):
     log_file.write(f"\n## {title}\n```\n")
@@ -12,7 +12,7 @@ def run_command(cmd, title, log_file):
     if result.stderr:
         log_file.write("\nSTDERR:\n" + result.stderr)
     log_file.write("```\n")
-    
+
     if result.returncode == 0:
         log_file.write("**✅ PASS**\n")
         return True
@@ -23,24 +23,24 @@ def run_command(cmd, title, log_file):
 def generate_reports():
     reports_dir = Path("reports")
     reports_dir.mkdir(exist_ok=True)
-    
+
     qg_path = reports_dir / "quality_gates.md"
     audit_path = reports_dir / "FINAL_CONTRACT_AUDIT.md"
-    
+
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
     success = True
-    
+
     with open(qg_path, "w", encoding="utf-8") as f:
         f.write(f"# Quality Gates Report\nGenerated at: {now}\n")
-        
+
         # 1. Pytest
         if not run_command(".venv\\Scripts\\pytest tests/", "Unit and Adversarial Tests", f):
             success = False
-            
+
         # 2. Ruff
         run_command(".venv\\Scripts\\ruff check .", "Code Linter (Ruff)", f)
-            
+
         # 3. Determinism
         if not run_command(".venv\\Scripts\\python scripts\\check_determinism.py", "Pipeline Determinism Check", f):
             success = False
@@ -52,7 +52,7 @@ def generate_reports():
             f.write("✅ **APPROVED** - All systems meet the strict contract guarantees.\n")
         else:
             f.write("❌ **REJECTED** - Quality gates failed.\n")
-            
+
         f.write("\n## Contract Guarantees Verified\n")
         f.write("- **Safety Firewall**: `FinalValidationGate` guarantees no plan is served unless valid.\n")
         f.write("- **No URL Leakage**: Adversarial testing confirms no internal/external URLs leak in user text.\n")
@@ -60,9 +60,9 @@ def generate_reports():
         f.write("- **Deterministic Compilation**: End-to-end hashes of identical inputs are strictly identical.\n")
         f.write("- **Contract-Safe Fallback**: API failures elegantly gracefully degrade without fabricating evidence.\n")
         f.write("- **Cache Invalidations**: Cache misses correctly when schemas, versions, or models change via PipelineFingerprint.\n")
-        
-        f.write(f"\nSee `quality_gates.md` for raw verification logs.\n")
-        
+
+        f.write("\nSee `quality_gates.md` for raw verification logs.\n")
+
     print(f"\nReports generated in {reports_dir.absolute()}")
 
 if __name__ == "__main__":

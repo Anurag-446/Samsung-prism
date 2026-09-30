@@ -22,11 +22,9 @@ class CaseCacheStore:
 
     def _init_db(self) -> None:
         with self._get_connection() as conn:
-            # We migrate to v2 by simply recreating. In production, use migrations.
-            conn.execute("DROP TABLE IF EXISTS case_cache")
             conn.execute(
                 """
-                CREATE TABLE case_cache (
+                CREATE TABLE IF NOT EXISTS case_cache (
                     cache_id TEXT PRIMARY KEY,
                     signature_hash TEXT NOT NULL,
                     canonical_signature_json TEXT NOT NULL,

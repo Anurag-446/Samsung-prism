@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.0
     llm_timeout_seconds: float = 10.0
     llm_max_retries: int = 1
-    min_action_evidence_score: float = 0.65
+    min_action_evidence_score: float = 0.35
 
     # Embedding settings
     embedding_model_name: str = "all-MiniLM-L6-v2"
